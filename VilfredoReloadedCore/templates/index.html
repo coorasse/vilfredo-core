@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<!--
+****************************************************************************
+#
+# This file is part of the Vilfredo Client.
+#
+# Copyright © 2009-2015 Pietro Speroni di Fenizio / Derek Paterson.
+#
+# VilfredoReloadedCore is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation version 3 of the License.
+#
+# VilfredoReloadedCore is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+# for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with VilfredoReloadedCore.  If not, see <http://www.gnu.org/licenses/>.
+#
+****************************************************************************
+-->
+<html lang="en"> 
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Vilfredo - Fair Decision-Making</title>
+        <meta name="description" content="Vilfredo allows groups from 5 to 20 people to ask open questions and reach consensus in a easy and fair way.">
+        <meta name="keywords" content="decision-making, voting, consensus, consensus building, open questions, eParticipation, eGovernment, fair decision">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-title" content="Vilfredo">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+<link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='images/apple-touch-icon-57x57.png') }}">
+<link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='images/apple-touch-icon-114x114.png') }}">
+<link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='images/apple-touch-icon-72x72.png') }}">    
+<link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='images/apple-touch-icon-144x144.png') }}">
+<link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='images/apple-touch-icon-60x60.png') }}">
+<link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='images/apple-touch-icon-120x120.png') }}">
+<link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='images/apple-touch-icon-76x76.png') }}">
+<link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='images/apple-touch-icon-152x152.png') }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon-180x180.png') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='custom-styles/styles.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='js/jquery.cookiebar/jquery.cookiebar.css') }}">
+    <!-- Windows 8, IE11 Tile Icons -->
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='images/favicon-144.png') }}">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="application-name" content="Vilfredo">
+    <meta name="msapplication-square70x70logo" content="{{ url_for('static', filename='images/smalltile.png') }}">
+    <meta name="msapplication-square150x150logo" content="{{ url_for('static', filename='images/mediumtile.png') }}">
+    <meta name="msapplication-wide310x150logo" content="{{ url_for('static', filename='images/widetile.png') }}">
+    <meta name="msapplication-square310x310logo" content="{{ url_for('static', filename='images/largetile.png') }}">
+
+<!-- iPad retina portrait startup image -->
+    <link href="{{ url_for('static', filename='images/apple-touch-startup-image-1536x2008.jpg') }}"
+          media="(device-width: 768px) and (device-height: 1024px)
+                 and (-webkit-device-pixel-ratio: 2)
+                 and (orientation: portrait)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPad retina landscape startup image -->
+    <link href="{{ url_for('static', filename='images/apple-touch-startup-image-1496x2048.jpg') }}"
+          media="(device-width: 768px) and (device-height: 1024px)
+                 and (-webkit-device-pixel-ratio: 2)
+                 and (orientation: landscape)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPad non-retina portrait startup image -->
+    <link href="{{ url_for('static', filename='images/apple-touch-startup-image-768x1004.jpg') }}"
+          media="(device-width: 768px) and (device-height: 1024px)
+                 and (-webkit-device-pixel-ratio: 1)
+                 and (orientation: portrait)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPad non-retina landscape startup image -->
+    <link href="{{ url_for('static', filename='images/apple-touch-startup-image-748x1024.jpg') }}"
+          media="(device-width: 768px) and (device-height: 1024px)
+                 and (-webkit-device-pixel-ratio: 1)
+                 and (orientation: landscape)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPhone 6 Plus portrait startup image
+    <link href="apple-touch-startup-image-1242x2148.png"
+          media="(device-width: 414px) and (device-height: 736px)
+                 and (-webkit-device-pixel-ratio: 3)
+                 and (orientation: portrait)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPhone 6 Plus landscape startup image 
+    <link href="apple-touch-startup-image-1182x2208.png"
+          media="(device-width: 414px) and (device-height: 736px)
+                 and (-webkit-device-pixel-ratio: 3)
+                 and (orientation: landscape)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPhone 6 startup image 
+    <link href="apple-touch-startup-image-750x1294.png"
+          media="(device-width: 375px) and (device-height: 667px)
+                 and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image">  -->
+ 
+    <!-- iPhone 5 startup image -->
+    <link href="{{ url_for('static', filename='images/apple-touch-startup-image-640x1096.jpg') }}"
+          media="(device-width: 320px) and (device-height: 568px)
+                 and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPhone < 5 retina startup image -->
+    <link href="{{ url_for('static', filename='images/apple-touch-startup-image-640x920.jpg') }}"
+          media="(device-width: 320px) and (device-height: 480px)
+                 and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image">
+ 
+    <!-- iPhone < 5 non-retina startup image -->
+    <link href="{{ url_for('static', filename='images/apple-touch-startup-image-320x460.jpg') }}"
+          media="(device-width: 320px) and (device-height: 480px)
+                 and (-webkit-device-pixel-ratio: 1)"
+          rel="apple-touch-startup-image">
+
+
+
+    </head>
+    <body>
+	
+	<div id="navbar"></div>
+	
+	<div class="container main">
+		
+		<div id="displaycookiebar"></div>
+		
+		<div id="invite_only" class="alert alert-info" role="alert" data-bind="visible: currentUserViewModel.isLoggedOut() && SITE_INVITE_ONLY">
+			<p><strong>Please Note</strong> <span data-bind="text: SITE_INVITE_ONLY_MESSAGE"></span> <a data-bind="attr: {href: SITE_INVITE_ONLY_LINK_URL}, visible: SITE_INVITE_ONLY_LINK_URL.length > 0"><span data-bind="text: SITE_INVITE_ONLY_LINK_TEXT, visible: SITE_INVITE_ONLY_LINK_TEXT.length > 0"></span></a></p>
+		</div>
+		
+		<div id="main_intro" class="jumbotron intro" data-bind="visible: currentUserViewModel.isLoggedOut()">
+		<h2>Fair Decision-Making</h2>
+		  <p>Vilfredo allows groups from 5 to 20 people to ask open questions and reach consensus in an easy and fair way.</p>
+		  <p><a class="btn btn-primary btn-lg" role="button" href="https://github.com/fairdemocracy/vilfredo-core/wiki">Learn more</a> </p>
+		</div>
+		
+		<div id="invited_intro" class="jumbotron intro">
+		<h2>Welcome to Vilfredo</h2>
+		<h2>You have been invited to participate in a question!</h2>
+		<br>
+		<div class="blurb">
+			<p>You got here by clicking on an invitation link emailed to you by a Vilfredo user.</p>
+			<p>If you are new to Vilfredo please click the Register button and sign up to participate.</p>
+			<p>If you are already a member just log in to begin participating.</p>
+			<br>
+			<span class="emphasisze">New User?</span> <button data-bind="click: registerViewModel().open" type="button" class="btn btn-success btn-lg navbutton">Register</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<span class="emphasisze">Existing user?</span> <button data-bind="click: loginViewModel().open" type="button" class="btn btn-primary btn-lg navbutton">Login</button>
+		</div>
+
+		</div>
+		
+		<!-- <div class="votesmap"></div> -->
+		
+		<!-- <div id="cvtriangle"></div> -->
+		
+		
+	
+		
+		<div class="notloggedin">
+			<div data-bind="visible: currentUserViewModel.isLoggedIn() && questionsViewModel.questions().length == 0">
+				<h3>You are not currently participating in any questions.</h3>
+			</div>
+		</div>
+		
+		
+		<div data-bind="visible: currentUserViewModel.isLoggedIn()" class="all-questions">
+		<br>
+		<h1>Active Questions</h1>
+		<div class="row">
+			<div class="col-md-12 icons new panel">
+				<div class="panel-heading">
+					<h2 class="panel-title"><span class="glyphicon glyphicon-flag questhdricon" aria-hidden="true"></span>Invitations to Participate</h2>
+                </div>
+                <div class="panel-body">
+				<div class="">
+					
+					
+					<div class="row">
+					
+					<div class="ask_question col-md-3 col-md-push-9 col-xs-12">
+					<a data-bind="click: beginNewQuestion" class="btn btn-primary btn-lg" role="button">Ask a Question</a>
+					</div>
+					
+					
+					<div id="new_invites" class="col-md-9 col-md-pull-3 col-xs-12">
+						<!-- ko foreach: currentUserViewModel.new_invites -->
+						<div class="item">
+						<a data-bind="click: currentUserViewModel.acceptInvite"><span title="Accept" class="label label-success" aria-hidden="true">Accept</span></a>
+					<a data-bind="click: currentUserViewModel.declineInvite"><span title="Decline" class="label label-danger" aria-hidden="true">Reject</span></a>
+						<a data-toggle="tooltip" title="View question text" data-bind="click: currentUserViewModel.openInviteQuestionText.bind($data, $index), attr: { title: currentUserViewModel.setinvitetooltip($data) }">
+						<!-- <span class="notificationicon glyphicon glyphicon-envelope" aria-hidden="true"></span> -->
+						<span data-bind="text: question_title"></span>
+						</a> from <span data-bind="text: sender_username"></span>
+						</div>
+						<!-- /ko -->
+					</div>
+					</div>
+					
+				</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div data-bind="visible: currentUserViewModel.isLoggedIn()" class="col-md-6 icons writing panel questions_writing">
+				<div class="panel-heading">
+                  <h2 class="panel-title"><span class="glyphicon glyphicon-edit questhdricon" aria-hidden="true"></span> Propose an Answer to a Question</h2>
+                </div>
+                <div class="panel-body">
+				<div class="">
+					<!-- ko foreach: questions -->
+					<!-- ko if: phase() == "writing" -->
+					
+					<div class="item">
+					<a data-toggle="tooltip" title="" data-bind="attr: { href: link, title: $root.settooltip($data) }">
+					<span class="glyphicon glyphicon-tree-deciduous questicon" aria-hidden="true"></span>
+					<span data-bind="text: title"></span></a> by <span data-bind="text: author"></span>
+					</div>
+					
+					<!-- /ko -->
+					<!-- /ko -->
+				</div>
+				</div>
+			</div>
+			<div data-bind="visible: currentUserViewModel.isLoggedIn()" class="col-md-6 icons voting panel questions_voting">
+				<div class="panel-heading">
+                  <h4 class="panel-title"><span class="glyphicon glyphicon-check questhdricon" aria-hidden="true"></span> Vote on all the Proposals</h4>
+                </div>
+                <div class="panel-body">
+				<div class="">
+					<!-- ko foreach: questions -->
+					<!-- ko if: phase() == "voting" -->
+					<div class="item">
+					<a data-toggle="tooltip" title="" data-bind="attr: { href: link, title: $root.settooltip($data) }">
+					<span class="glyphicon glyphicon-tree-deciduous questicon" aria-hidden="true"></span>
+					<span data-bind="text: title"></span></a> by <span data-bind="text: author"></span>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+				</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div data-bind="visible: currentUserViewModel.isLoggedIn()" class="col-md-12 icons consensus panel questions_results">
+				<div class="panel-heading">
+                  <h2 class="panel-title"><span class="glyphicon glyphicon-thumbs-up questhdricon" aria-hidden="true"></span> Questions Which have Found Solutions</h2>
+                </div>
+                <div class="panel-body">
+				<div class="">
+					<!-- ko foreach: questions -->
+					<!-- ko if: phase() == 'results' -->
+					
+					<div class="item">
+					<a data-toggle="tooltip" title="" data-bind="attr: { href: link + '/results', title: $root.settooltip($data) }">
+					<span class="glyphicon glyphicon-tree-deciduous questicon" aria-hidden="true"></span>
+					<span data-bind="text: title"></span></a> by <span data-bind="text: author"></span>
+					</div>
+					
+					<!-- /ko -->
+					<!-- /ko -->
+				</div>
+				</div>
+			</div>
+		</div>
+		</div> <!-- all-questions -->
+		
+		<div id="footer"></div>
+		
+	</div><!-- container -->
+
+
+
+<!-- Edit Question Modal -->
+	<div id="editquestion" class="modal fade" tabindex="1" data-backdrop="static" data-keyboard="false" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title">Edit a Question</h4>
+			<p><b>Questions may be edited until they receive a proposal.</b></p>
+	      </div>
+	      <div class="modal-body">
+		<div class="message alert alert-danger"></div>
+		
+		<form autocomplete="off" class="form-horizontal" role="form"> 
+		<div class="form-group">
+		    <label for="inputQuestionTitle" class="col-sm-2 control-label">Title</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: title"></span>
+		      <input data-bind="value: title" type="text" class="form-control input-lg" id="inputEditQuestionTitle" placeholder="Title">
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputQuestionBlurb" class="col-sm-2 control-label">Question Text</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: blurb"></span>
+			<textarea data-bind="value: blurb" id="inputEditQuestionBlurb" class="form-control" rows="6" placeholder="Type your question here"></textarea>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <div class="col-sm-offset-2 col-sm-10">
+		      <button data-bind="click: updateQuestion" type="button" class="btn btn-primary">Save Changes</button>
+			  <button data-bind="click: close" type="button" class="btn btn-default">Cancel</button>
+		    </div>
+		  </div>
+		</form>
+		</div><!-- /.modal-body -->
+	    </div><!-- modal-content -->
+	  </div><!-- modal-dialog -->
+	</div><!-- modal -->
+	
+	
+<!-- New Question Modal -->
+	<div id="addquestion" class="modal fade" tabindex="1" data-backdrop="static" data-keyboard="false" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title">Ask a Question</h4>
+	      </div>
+	      <div class="modal-body">
+		<div class="message alert alert-danger"></div>
+		
+		<form autocomplete="off" class="form-horizontal" role="form"> 
+		<div class="form-group">
+		    <label for="inputQuestionTitle" class="col-sm-2 control-label">Title</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: title"></span>
+		      <input data-bind="value: title" type="text" class="form-control input-lg" id="inputQuestionTitle" placeholder="Title">
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputQuestionBlurb" class="col-sm-2 control-label">Question Text</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: blurb"></span>
+			<textarea data-bind="value: blurb" id="inputQuestionBlurb" class="form-control" rows="6" placeholder="Type your question here"></textarea>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <div class="col-sm-offset-2 col-sm-10">
+		      <button data-bind="click: addQuestion" type="button" class="btn btn-primary">Submit</button>
+			  <button data-bind="click: close" type="button" class="btn btn-default">Cancel</button>
+		    </div>
+		  </div>
+		</form>
+		</div><!-- /.modal-body -->
+	    </div><!-- modal-content -->
+	  </div><!-- modal-dialog -->
+	</div><!-- modal -->
+	
+	<!-- View Question Blurb Modal -->
+	<div id="fullquestionblurb" class="modal fade" tabindex="1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-bind="click: closeInviteQuestionText" aria-hidden="true">×</button>
+					<h4 class="question_title modal-title">
+					</h4>
+				</div>
+				<div class="modal-body">
+					
+					<div class="question_text"></div>
+					<div><a data-bind="click: currentUserViewModel.acceptInviteFromModal.bind()"><span title="Accept" class="label label-success" aria-hidden="true">Accept</span></a>
+					<a data-bind="click: currentUserViewModel.declineInviteFromModal.bind()"><span title="Decline" class="label label-danger" aria-hidden="true">Reject</span></a></div>
+				</div><!-- /.modal-body -->
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
+	<!-- Tri Voting Modal -->
+	<div id="vote3waywindow" class="modal fade" tabindex="1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-bind="click: close3WayTriangle" aria-hidden="true">×</button>
+					<h4 class="modal-title">
+						Please Vote
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="show3waytriangle"></div>
+				</div><!-- /.modal-body -->
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	
+
+	<!-- Continuous Voting Modal -->
+	<div id="votenowwindow" class="modal fade" tabindex="1" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title">Please Vote</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="modalvotesmap"></div>
+		  </div><!-- /.modal-body -->
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
+	<!-- reset-pwd Modal shark -->
+	<div id="reset_pwd" class="modal fade" tabindex="1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title" id="myModalLabel">Reset Password</h4>
+				</div>
+				<div class="modal-body">
+					<div class="message alert alert-danger"></div>
+					<div class="intro">Enter the email you registered with and we will send you a link so you can create a new password.</div>
+					<form autocomplete="on" class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="inputEmail" class="col-sm-2 control-label">Email</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: email"></span>
+								<input data-bind="value: email" type="text" class="form-control input-lg" id="inputEmail" placeholder="Account Email Address">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+							 <button data-bind="click: reset.bind($data)" type="button" class="btn btn-primary">Send Request</button> <button data-bind="click: close" type="button" class="btn btn-default">Cancel</button>
+							</div>
+						</div>
+					</form>
+				</div><!-- modal-body -->
+			</div><!-- modal-content -->
+		</div><!-- modal-dialog -->
+	</div><!-- login modal -->
+	
+	<!-- HTML5 shim and Respond.js IE8 agree of HTML5 elements and media queries -->
+    	<!--[if lt IE 9]>
+      	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    	<![endif]-->
+		<script type="text/javascript" src="{{ url_for('static', filename='js/settings.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery/1.10.2/jquery.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-migrate.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='bootstrap/dist/js/bootstrap.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout-3.2.0.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout-mapping-debug.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/svg-1.5.0/jquery.svg.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/svg-1.5.0/jquery.svgdom.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/purl-master/purl.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/charCount.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jqBootstrapValidation.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/graph.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/vga.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout.validation.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='localization/en-US.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/cookies/jquery.cookie.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.cookiebar/jquery.cookiebar.js') }}"></script>
+		{{ flask_util_js.js }}
+		
+	<script type="text/javascript">
+	function initPage()
+	{
+		console.log('initPage called...');
+		
+		$('.current-questions').show();
+		
+		$.when(currentUserViewModel.loadUser()).then(function()
+		{
+			console.log('loadUser completed...');
+			
+			//currentUserViewModel.fetchNewInvites();
+			
+			// Load Templates
+			//
+			if (typeof(LOAD_GOOGLE_ANALYTICS) != "undefined" && LOAD_GOOGLE_ANALYTICS)
+			{
+    			$.get( STATIC_FILES + "/templates/analytics.template.html", function( template ) 
+    			{
+    				$('head').prepend( template );
+    			});
+			}
+			
+			$.get( STATIC_FILES + "/templates/navbar.template.html", function( template ) 
+			{
+				$( "#navbar" ).html( template );
+				//$('body').prepend( data );
+				ko.applyBindings(currentUserViewModel, $('#navbar')[0]);
+				$('.home').attr('href', VILFREDO_URL);
+				$('.navbar-brand').attr('href', VILFREDO_URL);
+			});
+			
+			$.get( STATIC_FILES + "/templates/footer.template.html", function( template ) 
+			{
+				$( "#footer" ).html( template );
+				ko.applyBindings(currentUserViewModel, $('#footer')[0]);
+			});
+			
+			$.get( STATIC_FILES + "/templates/login.template.html", function( template ) 
+			{
+				//$( "#login-box" ).html( template );
+				$('body').append( template )
+				ko.applyBindings(loginViewModel, $('#login')[0]);
+				$('#login').on('hide.bs.modal', function(e) {
+					loginViewModel().clear();
+				});
+				$('.pwdresetlink').attr('href', VILFREDO_URL+'/lostpassword');
+			});
+			
+			$.get( STATIC_FILES + "/templates/register.template.html", function( template ) 
+			{
+				//$( "#register-box" ).html( template );
+				$('body').append( template )
+				ko.applyBindings(registerViewModel, $('#register')[0]);
+				$('#register').on('hide.bs.modal', function(e) {
+					registerViewModel().clear();
+				});
+			});
+			
+			
+			$.get( STATIC_FILES + "/templates/participants.template.html", function( template ) 
+			{
+				$('body').append( template )
+				ko.applyBindings(permissionsViewModel, $('#participants')[0]);
+			});
+			
+			$.get( STATIC_FILES + "/templates/add_users.template.html", function( template ) 
+			{
+				$('body').append( template )
+				ko.applyBindings(inviteUsersViewModel, $('#add_users')[0]);
+			});
+			
+			checkVGAMessages();
+			
+			if (getQueryVariable('eit'))
+			{
+				$('#invited_intro').show();
+			}
+			else if (currentUserViewModel.isLoggedOut())
+			{
+				$('#main_intro').show();
+			}
+		});
+	}
+	
+	$(function() {
+		currentUserViewModel = new CurrentUserViewModel();
+		questionsViewModel = new QuestionsViewModel();
+		//editQuestionViewModel = ko.validatedObservable( new EditQuestionViewModel() ); 
+		loginViewModel = ko.validatedObservable( new LoginViewModel() );
+		registerViewModel = ko.validatedObservable( new RegisterViewModel() );
+		passwordResetViewModel = ko.validatedObservable( new PasswordResetViewModel() );
+
+		questionViewModel = new QuestionViewModel();
+		permissionsViewModel = new PermissionsViewModel();
+		inviteUsersViewModel = new InviteUsersViewModel();
+		
+		$.cookieBar({
+			fixed: false, bottom: false, 
+			forceShow: false, zindex: '1040', 
+			effect: 'slide', autoEnable: false, 
+			element: '#displaycookiebar'
+		});
+		
+		initPage();
+		
+		//$('.votesmap').svg({onLoad: createVotesMap});
+		
+		$('#votenowwindow').on('show.bs.modal', function() {
+			//console.log('votenowwindow modal shown...');
+			$('.modalvotesmap').svg({onLoad: createVoteMap});
+		})
+		
+		/*
+		$('#login').on('hide.bs.modal', function(e) {
+			loginViewModel().clear();
+		})*/
+		
+		/*
+		$('#register').on('hide.bs.modal', function(e) {
+			registerViewModel().clear();
+		})*/
+	
+		
+		//$('#cvtriangle').svg({loadURL: STATIC_FILES + '/images/voting_triangle.svg', onLoad: initCVTriangleLarge});
+		
+		
+		ko.validation.init({ insertMessages: false, decorateElement: true, errorClass: "errormsg" });
+	
+		//-->ko.applyBindings(currentUserViewModel, $('#navbar')[0]);
+		
+		//ko.applyBindings(loginViewModel, $('#login')[0]);
+		
+		ko.applyBindings(passwordResetViewModel, $('#reset_pwd')[0]);
+		ko.applyBindings(questionsViewModel, $('.all-questions')[0]);
+		
+		ko.applyBindings(questionsViewModel, $('.notloggedin')[0]);
+		//ko.applyBindings(editQuestionViewModel, $('#editquestion')[0]);
+		ko.applyBindings(loginViewModel, $('#invited_intro')[0]);
+		//ko.applyBindings(registerViewModel, $('#register')[0]);
+		ko.applyBindings(currentUserViewModel, $('.intro')[0]);
+		
+		ko.applyBindings(currentUserViewModel, $('#invite_only')[0]);
+		
+		ko.applyBindings(currentUserViewModel, $('#fullquestionblurb')[0]);
+				
+		
+		//$('.home').attr('href', VILFREDO_URL);
+		//$('.navbar-brand').attr('href', VILFREDO_URL);
+		//$('.pwdresetlink').attr('href', VILFREDO_URL+'/lostpassword');
+		
+		$('body').popover({
+		    selector: '[rel="popover"]',
+			trigger: 'hover',
+			html: true,
+			placement: 'top',
+			content: 'hello world',
+			title: 'Add your vote',
+			content: '<div class="poptriangle"></div>'
+		});
+		
+		$('body').on('show.bs.popover', function() {
+  			console.log('popover displayed...');
+		});
+		$('body').on('hidden.bs.popover', function() {
+  			console.log('popover hidden...');
+		});	
+		
+		$('body').tooltip({
+		    selector: "[data-toggle='tooltip']",
+			html: true,
+			container: 'body'
+		});
+		
+		
+		$("#inputQuestionTitle").charCount({
+			allowed: 120,		
+			warning: 10,
+			counterText: "Left" + " "
+		});
+		
+		$("#inputQuestionBlurb").charCount({
+			allowed: 10000,		
+			warning: 9950,
+			counterText: "Left" + " "
+		});
+		
+		$('button').removeAttr('disabled');
+				
+		//$("input,select,textarea").not("[type=submit]").jqBootstrapValidation();
+		$("textarea").jqBootstrapValidation();
+		
+		$(document).on({
+		    mouseenter: function () {
+		        $(this).addClass('over');
+		    },
+		    mouseleave: function () {
+		        $(this).removeClass('over');
+		    }
+		}, ".question-blurb");		
+	});
+	</script>
+
+   </body>
+</html>

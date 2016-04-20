@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<!--
+****************************************************************************
+#
+# This file is part of the Vilfredo Client.
+#
+# Copyright © 2009-2015 Pietro Speroni di Fenizio / Derek Paterson.
+#
+# VilfredoReloadedCore is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation version 3 of the License.
+#
+# VilfredoReloadedCore is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+# for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with VilfredoReloadedCore.  If not, see <http://www.gnu.org/licenses/>.
+#
+****************************************************************************
+-->
+<html> 
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Vilfredo - Fair Decision-Making</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-title" content="Vilfredo">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='custom-styles/styles.css') }}">
+    </head>
+    <body>
+	<div id="navbar"></div>
+
+	<div class="container main">
+		
+		<button id="goto_btn" data-bind="click: goto_question.bind()" type="button" class="btn btn-primary btn-lg navbutton">Show Question Page</button>
+		<br><br><br>
+		
+		<div class="author_controls">
+		<button data-bind="click: permissionsViewModel.open_permissions.bind(), visible: author_id() == currentUserViewModel.userid()" class="btn btn-primary">Participants</button>
+		</div>
+
+		<div class="question-view" data-bind="visible: currentUserViewModel.isLoggedIn()">
+		<div class="page-header question-info">
+			<h1>Results for: <span data-bind="text: title"></span></h1>
+			
+			<p>by <span class="authorname" data-bind="text: author"></span></p>
+			<p>Generation <span data-bind="text: generation"></span>: <span data-bind="text: phase"></span> phase.</p>
+			<p><span data-bind="text: time_dhm(get_timestamp()-last_move_on())"></span> has passed since question ended.</p>
+			<br>
+		</div>
+		
+		<br>
+		
+		<div id="final_results" class="panel">
+		  <div class="well">
+				<h2>Results</h2>
+				<p>There are <strong><span data-bind="text: proposalsViewModel.pareto().length"></span> winning proposals</strong>. They are listed in order of preference by the group.</p>
+				<ul>
+				<!-- ko foreach: final_results -->
+				<li>
+				<p>"<span data-bind="text: title"></span>" by <span data-bind="text: author"></span> which was <span data-bind="visible: relations.understood == false">not</span> fully understood by everyone. Median Like was: <strong><span data-bind="text: (medx * 100).toFixed(2)"></span>%</strong></p>	
+				</li>
+				<!-- /ko -->
+				</ul>
+		  </div>
+		</div>
+		<!-- final_results end -->
+
+
+		
+		<!-- Graphs -->
+		<div id="voting_graphs" data-bind="visible: (questionViewModel.phase() == 'voting' && proposalsViewModel.votedAll) || (questionViewModel.phase() == 'writing' && generation() > 1)">
+			<br><br>
+		<h2>Voting Graph</h2>
+		<p>The proposal graph shows how each proposal dominates another according to the voting pattern. The winners are shown in blue at the top.</p>
+		<div class="controls text-center">	
+			  <button id="vgonly" type="button" class="btn btn-md btn-info">All Proposals</button>
+			  <button id="bothgraphs" type="button" class="btn btn-md btn-info">Show Both</button>
+			  <button id="pfonly" type="button" class="btn btn-md btn-info">Winning Proposals Only</button>
+		</div>
+		<br>
+		<div class="graphs">
+			<div class="singlegraph"></div>
+			<div class="graphcontainer">
+				<div id="votesgraph" class="leftgraph"></div>
+				<div id="pfgraph" class="rightgraph"></div>
+			</div>
+		</div>
+		</div>
+		<!-- Graphs end -->
+		
+		
+		<!-- 
+		Inherited Proposals 
+		-->
+		<div data-bind="visible: questionViewModel.phase() == 'writing' && questionViewModel.generation() > 1" class="inherited_proposals narrow">
+			
+		<div class="page-header">
+			<h2>Inherited Proposals</h2>
+			<p>These proposals were inherited from the previous generation:</p>
+		</div>
+			
+
+		</div>
+		<!-- 
+		Inherited Proposals End
+		-->
+		
+				
+		<!-- 
+		Current Proposals 
+		-->
+		<div class="proposals narrow">
+		
+		<div class="current-proposals">
+		<div data-bind="visible: questionViewModel.phase() == 'voting'" class="page-header">
+			<h2>Current Proposals</h2>
+			<p data-bind="visible: proposals().length > 0">Vote on all the proposals below:</p>
+		</div>
+		<div data-bind="visible: questionViewModel.phase() == 'writing'" class="page-header">
+			<h2>Your New Proposals</h2>
+			<p data-bind="visible: proposals().length > 0">Below are the proposals you have created during the writing phase of this generation:</p>
+		</div>
+		
+		<div data-bind="visible: questionViewModel.proposal_count == 0 && questionViewModel.phase() == 'writing' && questionViewModel.can_propose" class="well highlight">
+		<p>There are no proposals so far. Why not be the first to propose an answer?</p>
+		</div>
+		
+		<div data-bind="visible: proposals().length == 0 && questionViewModel.phase() == 'writing' && questionViewModel.can_propose" class="well highlight">
+		<p>You have not written any proposals so far. If you think you have a possible solution, why not propose an answer?</p>
+		</div>
+		
+		<div class="proposal_list row">
+			<!-- ko foreach: pareto -->
+			<div class="col-md-1" data-bind="text: $index() + 1"></div>
+			<div class="proposal col-md-11" data-bind="attr: { pid: id, index: $index }">
+			<input data-bind="value: id" type="hidden" class="propId" value="">
+			<input data-bind="value: $index" type="hidden" class="index" value="">
+     		<input data-bind="value: author" type="hidden" class="author" value="">
+			<input data-bind="value: uri" type="hidden" class="uri" value="">
+			<div data-bind="css: endorse_type" class="panel">
+				<div class="panel-heading" data-bind="style: {color: box_color(), background: box_background(), border: box_background()}">
+					<h3 class="panel-title proposal" data-bind="text: title, click: $parent.read.bind($data, $index(), 'content')"></h3>
+				</div>
+				<div class="panel-body proposal-blurb">
+					<span data-bind="html: blurb"></span>
+				</div>
+				<div class="panel-footer proposal-footer">
+					<a title="Open proposal window" data-bind="click: $parent.read.bind($data, $index(), 'content')"><span class="glyphicon glyphicon-new-window"></span></a>&nbsp;&nbsp;
+					<a title="Open comments window" data-bind="click: $parent.read.bind($data, $index(), 'comments')"><span class="glyphicon glyphicon-comment"></span>&nbsp;<span data-bind="text: comment_count"></span></a>&nbsp;&nbsp;
+					<a title="Open questions window" data-bind="click: $parent.read.bind($data, $index(), 'questions')"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<span data-bind="text: question_count"></span></a>
+					<div data-bind="click: $parent.openvotemap.bind($data, $index())" class="voting"></div>
+				</div>
+			</div>
+			</div><!-- /ko -->
+		</div>
+		</div>
+		<!-- 
+		Current Proposals End
+		-->
+		
+		
+			<div id="results_map" data-bind="visible: (questionViewModel.phase() == 'results')">
+				
+			<!--
+			<div class="btn-group" role="group">
+	 	   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+		      <span data-bind="text: show_pareto_results"></span>
+		      <span class="caret"></span>
+		    </button>
+		    <ul class="dropdown-menu" role="menu">
+		      <li><a data-bind="click: $root.select_pf_only.bind($data, false)" href="#">All Proposals</a></li>
+		      <li><a data-bind="click: $root.select_pf_only.bind($data, true)" href="#">Pareto Only</a></li>
+		    </ul>
+		   </div>
+			<br><br>
+			-->
+	
+			<h2>Final Results Map</h2>
+			<p>The results map below show the <strong>median</strong> vote for each proposal in grey and the winning proposals in orange. Click on a median point to display the actual votes from each participant.</p>
+		
+			<div id="resultstriangle"></div>
+			<!-- resultstriangle table end -->
+		</div> 
+		<!-- results_map end -->
+		
+		
+	</div><!-- /container -->
+
+
+	<div id="footer"></div> <!-- page end -->
+	
+	
+	<!-- Tri Voting Modal -->
+	<div id="vote3waywindow" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="VoteNowBox" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-bind="click: close3WayTriangle" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title">Please Vote</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="show3waytriangle"></div>
+		  </div><!-- /.modal-body -->
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
+
+	<!-- Continuous Voting Modal -->
+	<div id="votemapwindow" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="VoteNowBox" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content"> 
+	      <div class="vpheader modal-header"> <!-- add here -->
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<p class="modal-title"><span id="votemap-thisprop"></span></p>
+	      </div>
+	      <div class="modal-body">
+			<div id="modalvotesmap"></div>
+		</div><!-- /.modal-body -->
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	
+	<!-- View Proposal Modal -->
+	<div data-bind="with: proposal" id="viewproposal" class="modal fade" tabindex="=1" role="dialog" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div data-bind="css: endorse_type" class="vpheader modal-header">
+		  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		
+			<div class="row">	
+				<div class="col-md-9">
+					<div class="row">
+						<h4 class="vptitle modal-title"><span data-bind="text: id"></span>: <span data-bind="text: title"></span></h4>
+					</div>
+					<div class="row">
+						<div class="controls">
+						<a data-bind="click: showProposalContent"><span class="glyphicon glyphicon-file"></span> Proposal</a>&nbsp;&nbsp;&nbsp;
+						<a data-bind="click: showProposalComments"><span class="glyphicon glyphicon-comment"></span> Comments</a>&nbsp;&nbsp;&nbsp;
+						<a data-bind="click: showProposalQuestions"><span class="glyphicon glyphicon-question-sign"></span> Questions</a>
+						</div> <!-- controls -->
+								</div>
+				</div>
+					<div data-bind="click: openvotemap.bind($data)" class="votebox col-md-3"></div>
+			</div>
+						
+	      </div><!-- modal-header -->
+	      <div id="viewproposalbody" class="modal-body">
+		
+		  <div class="message alert alert-danger"></div>
+	
+		<div>				
+			<div id="propdetails">
+				<!-- ko if: questionViewModel.question_type() == 1 -->
+					<span data-bind="html: blurb"></span>  
+					<!-- /ko -->
+					<!-- ko if: questionViewModel.question_type() == 2 -->
+					<img data-bind="attr: { src: image_url() }" width="200px" height="200px"/> 
+					<!-- /ko -->
+			</div>
+			<div id="showcomments">
+				<div class="col-md-6">
+					<h4>Points For</h4>
+					<div class="comments for">
+					<!-- ko foreach: comments -->
+					<!-- ko if: comment_type() == 'for' -->
+					<div class="comment for">
+						<span data-bind="click: viewFullText.bind($data.comment()), html: displayCommentText($data.comment())"></span>
+						<div data-bind="css: { supports: $parent.userSupports($data) }" class="select_comment">
+						<button data-bind="click: $parent.toggleCommentSupport" type="button" class="btn btn-default btn-xs">agree</button>
+						</div>
+					</div>					
+					<!-- /ko -->
+					<!-- /ko -->
+					
+					<span data-bind="visible: questionViewModel.phase() == 'voting'">
+					<textarea data-bind="textInput: comment_for" id="inputForComment" class="form-control" rows="2" placeholder="Point For"></textarea>
+					<button data-bind="click: submitComment.bind($data, 'for')" id="inputForCommentBtn" type="button" class="btn btn-default btn-xs">Submit</button>
+					</span>
+					
+					</div>
+					<!-- for comments end -->
+				
+				</div>
+				<div class="col-md-6">
+					<h4>Points Against</h4>
+					<div class="comments against">
+					<!-- ko foreach: comments -->
+					<!-- ko if: comment_type() == 'against' -->
+					<div class="comment against">
+						<span data-bind="click: viewFullText.bind($data.comment()), html: displayCommentText($data.comment())"></span>
+						<div data-bind="css: { supports: $parent.userSupports($data) }" class="select_comment">
+						<button data-bind="click: $parent.toggleCommentSupport" type="button" class="btn btn-default btn-xs">agree</button>
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+					
+					<span data-bind="visible: questionViewModel.phase() == 'voting'">
+					<textarea data-bind="textInput: comment_against" id="inputAgainstComment" class="form-control" rows="2" placeholder="Point Against"></textarea>
+					<button data-bind="click: submitComment.bind($data, 'against')" id="inputAgainstCommentBtn" type="button" class="btn btn-default btn-xs">Submit</button>
+					</span>
+					</div>
+				</div>
+			</div> 
+			<div id="showquestions">
+				<div class="row qaheaders">
+					<div class="col-md-6">
+						<h4>Questions</h4>
+					</div>
+					<div class="col-md-6">
+						<h4>Answers</h4>
+					</div>
+				</div>
+				<div class="comments">
+					<!-- ko foreach: comments -->
+					<!-- ko if: comment_type() == 'question' -->
+					<div class="qabox row">
+						<div class="col-md-6">
+							<div class="comment question">
+								<div data-bind="click: viewFullText.bind($data.comment()), html: displayCommentText($data.comment())"></div>
+								<div data-bind="css: { supports: $parent.userSupports($data) }" class="select_comment">
+								<button data-bind="click: $parent.toggleCommentSupport" type="button" class="btn btn-default btn-xs">agree</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 ans">
+							<!-- ko if: $parent.getAnswerObject(id) -->
+							<div data-bind="with: $parent.getAnswerObject(id)" class="comment answer">
+								<div data-cid="id" data-bind="click: viewFullText.bind($data.comment()), html: displayCommentText($data.comment())"></div>
+								<div data-bind="css: { supports: $root.userSupports($data) }" class="select_comment">
+								<button data-bind="click: $root.toggleCommentSupport" type="button" class="btn btn-default btn-xs">like</button>
+								</div>
+							</div>
+							<!-- /ko -->
+															
+							<!-- ko ifnot: $parent.getAnswerObject(id) -->
+							
+							<!-- ko if: $root.proposal.author_id() == currentUserViewModel.user.id && questionViewModel.phase() == 'voting'-->
+							<textarea data-bind="attr: { 'data-commentid': id }" class="inputAnswerComment form-control" rows="3" placeholder="Answer Question"></textarea>
+							<button data-bind="click: function() { $root.addcommentanswer(id()) }" type="button" class="btn btn-default btn-xs">answer</button>
+							<!-- /ko -->
+							
+							<!-- ko ifnot: $root.proposal.author_id() == currentUserViewModel.user.id -->
+							<div class="comment no-answer">
+							<span>No answer yet</span>
+							</div>
+							<!-- /ko -->
+							
+							<!-- /ko -->
+							
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+					<div class="qabox row">
+					<div class="col-md-6">
+					<span data-bind="visible: questionViewModel.phase() == 'voting'">
+					<textarea data-bind="textInput: question" id="inputQuestionComment" class="form-control" rows="2" placeholder="Question"></textarea>
+					<button data-bind="click: submitComment.bind($data, 'question')" id="inputQuestionCommentBtn" type="button" class="btn btn-default btn-xs">Submit</button>
+					</span>
+					</div>
+					<div class="col-md-6"></div>
+					</div>
+				</div>
+				<!-- question and answers end -->
+			</div>
+			</div>
+		  </div><!-- modal-body -->
+		<div class="modal-footer">
+		</div><!-- modal-footer -->
+	    </div><!-- modal-content -->
+	  </div><!-- modal-dialog -->
+	</div><!-- modal -->
+	
+	
+	
+	<!-- New Proposal Modal -->
+	<div id="addproposal" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="AddProposalBox" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title">Add Proposal</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="alert alert-danger"></div>
+			<form autocomplete="off" class="form-horizontal" role="form">
+		  	<div class="form-group">
+		    <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+		    <div class="col-sm-10">
+			  <span class="errormsg" data-bind="validationMessage: title"></span>
+		      <input data-bind="value: title" type="text" class="form-control input-lg" id="inputProposalTitle" placeholder="Title">
+		    </div>
+		  </div>
+		<div class="form-group">
+		    <label for="inputAbstract" class="col-sm-2 control-label">Abstract (optional)</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: abstract"></span>
+			<textarea data-bind="value: abstract" id="inputProposalAbstract" class="form-control" rows="4" placeholder="Abstract Text"></textarea>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputBlurb" class="col-sm-2 control-label">Proposal Text</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: blurb"></span>
+			<textarea data-bind="value: blurb" id="inputProposalBlurb" class="form-control" rows="6" placeholder="Proposal Text"></textarea>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <div class="col-sm-offset-2 col-sm-10">
+		      <button data-bind="click: addProposal, enable: isValid()" type="button" class="btn btn-primary">Submit</button>
+			  <button data-bind="click: close" type="button" class="btn btn-default">Cancel</button>
+		    </div>
+		  </div>
+		</form>
+		</div><!-- /.modal-body -->
+	    </div><!-- modal-content -->
+	  </div><!-- modal-dialog -->
+	</div><!-- modal -->
+	
+	</div><!-- modal -->
+	
+
+	
+	<script id="customMessageTemplate" type="text/html">
+    <em class="customMessage" data-bind='validationMessage: field'></em>
+	</script>
+
+	<!-- HTML5 shim and Respond.js IE8 agree of HTML5 elements and media queries -->
+    	<!--[if lt IE 9]>
+      	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    	<![endif]-->
+		
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery/1.10.2/jquery.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-migrate.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='bootstrap/dist/js/bootstrap.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout-3.2.0.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout-mapping-debug.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/svg-1.4.4/jquery.svg.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.svgdom.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/svg-1.4.4/jquery.svganim.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/cookies/jquery.cookie.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/purl-master/purl.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/charCount.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/settings.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/graph.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/vga.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout.validation.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='localization/en-US.js') }}"></script>
+		{{ flask_util_js.js }}
+	
+	<script type="text/javascript">
+	function initPage()
+	{
+		console.log('initPage called...');
+		
+		$.when(currentUserViewModel.loadUser(), 
+			   questionViewModel.fetchQuestion(),
+			   proposalsViewModel.fetchPareto(),
+			   questionViewModel.fetchFinalResults(),
+			   questionViewModel.fetchVotingData()).done(function()
+		{
+			console.log('User and question loaded...');
+			$('.question-view, .current-proposals').show();
+			
+			// Load Templates
+			$.get( STATIC_FILES + "/templates/analytics.template.html", function( template ) 
+			{
+				$('head').append( template );
+			});
+			$.get( STATIC_FILES + "/templates/navbar.template.html", function( data ) 
+			{
+				$( "#navbar" ).html( data );
+				ko.applyBindings(currentUserViewModel, $('#navbar')[0]);
+				$('.home').attr('href', VILFREDO_URL);
+				$('.navbar-brand').attr('href', VILFREDO_URL);
+			});
+			$.get( STATIC_FILES + "/templates/footer.template.html", function( data ) 
+			{
+				$( "#footer" ).html( data );
+				ko.applyBindings(currentUserViewModel, $('#footer')[0]);
+			});
+			
+			$.get( STATIC_FILES + "/templates/login.template.html", function( template ) 
+			{
+				//$( "#login-box" ).html( template );
+				$('body').append( template )
+				ko.applyBindings(loginViewModel, $('#login')[0]);
+				$('#login').on('hide.bs.modal', function(e) {
+					loginViewModel().clear();
+				});
+				$('.pwdresetlink').attr('href', VILFREDO_URL+'/lostpassword');
+			});
+			
+			$.get( STATIC_FILES + "/templates/register.template.html", function( template ) 
+			{
+				//$( "#register-box" ).html( template );
+				$('body').append( template )
+				ko.applyBindings(registerViewModel, $('#register')[0]);
+				$('#register').on('hide.bs.modal', function(e) {
+					registerViewModel().clear();
+				});
+			});
+			
+			$.get( STATIC_FILES + "/templates/participants.template.html", function( template ) 
+			{
+				$('body').append( template )
+				ko.applyBindings(permissionsViewModel, $('#participants')[0]);
+			});
+			
+			$.get( STATIC_FILES + "/templates/add_users.template.html", function( template ) 
+			{
+				$('body').append( template )
+				ko.applyBindings(inviteUsersViewModel, $('#add_users')[0]);
+			});
+			
+			questionViewModel.selected_algorithm(2);
+			
+			if (questionViewModel.phase() == 'results')
+			{
+				console.log("Welcome to the results page...");
+				$('#resultstriangle').svg({onLoad: createResultsMap});
+			}
+			else
+			{
+				window.location.replace(VILFREDO_URL);
+			}
+			
+			if (questionViewModel.question_type() == 2)
+			{
+				$('.proposal-blurb').css('padding', '0');
+				scaleProposalImages();
+			}
+		
+			var qid = questionViewModel.id();
+			var gid = questionViewModel.generation();
+			$('.alglink').attr('href', VILFREDO_URL + '/domination/' + qid + '/gen/' + gid);
+			
+			$('#invited_intro').show();
+			
+			checkVGAMessages();
+				
+			//
+			$( window ).resize(function() {
+				console.log('window resized');
+				redoResultsMap();
+			});
+			//
+		});
+	}
+	
+	$(function() 
+	{
+		currentUserViewModel = new CurrentUserViewModel();
+		proposalsViewModel = new ProposalsViewModel();
+		addProposalViewModel = ko.validatedObservable( new AddProposalViewModel() );
+		loginViewModel = ko.validatedObservable( new LoginViewModel() );
+		registerViewModel = ko.validatedObservable( new RegisterViewModel() );
+		voteMapViewModel = new VoteMapViewModel();
+		passwordResetViewModel = ko.validatedObservable( new PasswordResetViewModel() );
+		
+		//newCommentViewModel = new NewCommentViewModel();
+		newCommentViewModel = ko.validatedObservable( new NewCommentViewModel() );
+		
+		threeWayVoteViewModel = new ThreeWayVoteViewModel();
+		viewProposalViewModel = new ViewProposalViewModel();
+		questionViewModel = new QuestionViewModel();
+		permissionsViewModel = new PermissionsViewModel();
+		inviteUsersViewModel = new InviteUsersViewModel();
+		
+		initPage();
+		
+		$('#viewproposal').on('shown.bs.modal', function() {
+			//console.log('votemapwindow modal shown...');
+			if (questionViewModel.phase() == 'voting' && questionViewModel.can_vote)
+			{
+				$('.votebox').svg({loadURL: STATIC_FILES + '/images/triangle_b.svg'});
+			}
+			
+			switch(viewProposalViewModel.panel)
+			{
+			   case 'comments':
+			       viewProposalViewModel.showProposalComments();
+			       break;
+			   case 'questions':
+			       viewProposalViewModel.showProposalQuestions();
+			       break;
+			   default:
+			       break;
+			}
+		})
+		
+		$('#votemapwindow').on('shown.bs.modal', function() {
+			//console.log('votemapwindow modal shown...');
+			$('#modalvotesmap').svg({onLoad: createVoteMap}); // shark
+		})
+		
+		$('#votemapwindow').on('hide.bs.modal', function() {
+			console.log('votemapwindow modal about to close, destroy map...');
+			$('#modalvotesmap').svg('destroy');
+			$('#votemap-thisprop').html('');
+		})
+		
+		ko.validation.init({ insertMessages: false, decorateElement: true, errorClass: "errormsg" });
+		
+		
+		ko.applyBindings(questionViewModel, $('#final_results')[0]);
+		
+		
+		
+		$(".question-info").each(function(){
+		    ko.applyBindings(questionViewModel, $(this)[0]);
+		});
+		
+		ko.applyBindings(questionViewModel, $('.author_controls')[0]);
+	
+		//ko.applyBindings(loginViewModel, $('#login')[0]);
+		
+		$(".proposals").each(function(){
+		    ko.applyBindings(proposalsViewModel, $(this)[0]);
+		});
+		ko.applyBindings(proposalsViewModel, $('.inherited_proposals')[0]);
+		
+		//ko.applyBindings(questionViewModel, $('#participationtable')[0]);
+		//ko.applyBindings(questionViewModel, $('#results_map')[0]);
+		ko.applyBindings(questionViewModel, $('#voting_graphs')[0]);
+		
+		ko.applyBindings(questionViewModel, $('#goto_btn')[0]);
+		
+		
+		//ko.applyBindings(proposalsViewModel, $('#keyplayer_info')[0]);
+				
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal #propdetails')[0]);
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal #showcomments')[0]);
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal #showquestions')[0]);
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal .vpheader')[0]);
+		//ko.applyBindings(newCommentViewModel, $('.newcommentpanel')[0]);
+		//ko.applyBindings(currentUserViewModel, $('.navbar')[0]);
+		
+		//ko.applyBindings(registerViewModel, $('#register')[0]);
+		ko.applyBindings(addProposalViewModel, $('#addproposal')[0]);
+		ko.applyBindings(threeWayVoteViewModel, $('#vote3waywindow')[0]);
+		
+		ko.applyBindings(voteMapViewModel, $('#votemapwindow')[0]);
+		
+
+		$('#vote3waywindow').on('hidden.bs.modal', function () {
+  			console.log('vote3waywindow hidden...');
+			$(this).find('.show3waytriangle').svg('destroy');
+		});
+		
+		$('#viewproposal').on('hidden.bs.modal', function () {
+  			console.log('viewproposal hidden...');
+			viewProposalViewModel.reset();
+		});	
+		$('#viewproposal').on('shown.bs.modal', function () {
+			viewProposalViewModel.displayProposalContent();
+		});
+		
+		
+		$('#addproposal').on('hide.bs.modal', function(e) {
+			$(this).find(".form-control").val('').trigger("setcharcount");
+			addProposalViewModel().clear();
+			$(this).find("button").removeAttr('disabled');
+		});
+		
+		$('#viewproposal').on('hide.bs.modal', function(e) {
+			$(this).find("textarea").val('');
+		});
+		
+		
+		//
+		// comment boxes
+		//
+		$('#inputForComment').on('click', function (e) {
+			$(this).data('clicked', true);
+			e.stopPropagation();
+		});
+		$('#inputAgainstComment').on('click', function (e) {
+			$(this).data('clicked', true);
+			e.stopPropagation();
+		});
+		
+		//$('.home').attr('href', VILFREDO_URL);
+		//$('.navbar-brand').attr('href', VILFREDO_URL);
+
+		/*
+		$('body').popover({
+		    selector: '[rel="popover"]',
+			trigger: 'hover',
+			html: true,
+			placement: 'top',
+			content: 'hello world',
+			title: 'Add your vote',
+			content: '<div class="poptriangle"></div>'
+		});*/
+		
+		$('body').on('show.bs.popover', function () {
+  			console.log('popover displayed...');
+		});
+		$('body').on('hidden.bs.popover', function () {
+  			console.log('popover hidden...');
+		});	
+		
+		$("#inputProposalTitle").charCount({
+			allowed: 120,		
+			warning: 10,
+			counterText: "Characters Left" + " "
+		});
+		
+		$("#inputProposalBlurb").charCount({
+			allowed: 10000,		
+			warning: 9950,
+			counterText: "Characters left" + " "
+		});
+		
+		$("#inputProposalAbstract").charCount({
+			allowed: 5000,		
+			warning: 4950,
+			counterText: "Characters left" + " "
+		});
+		
+		$('button').removeAttr('disabled');
+		
+		$("[data-toggle='tooltip']").tooltip();
+	});	
+	</script>
+	</body>
+</html>

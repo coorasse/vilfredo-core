@@ -1,0 +1,1028 @@
+@graph-height: 550px;
+
+body {
+  /*padding-top: 50px;*/
+}
+
+.h1 {
+	padding-left:10px;
+}
+
+.page-header {
+ padding-bottom: 0px; 
+ margin: 0px; 
+ border-bottom: 0px; 
+}
+
+.container.main {
+	padding-top: 75px;
+}
+
+.navbar-apptitle {
+	color: #fff;
+	font-weight: bold;
+	font-size: 3em;
+	padding-right: 20px;
+	padding-left: 10px;
+}
+
+.navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+  background-color: #222222;
+  text-align: center;
+  padding-left: 25px;
+}
+
+.navbar-collapse .collapse .in {
+  background-color: #222222;
+}
+
+.navbar-toggle {
+ background-color: #eeeeee;
+}
+
+.navbar-toggle:hover, .navbar-toggle:focus, .navbar-toggle:visited, .navbar-toggle:active {
+ background-color: #ffffff!important;
+}
+
+#keyplayer_info {
+	display: none;
+}
+
+#footer {
+	margin-top: 60px;
+}
+
+#cookie-bar a {
+	line-height: 30px;
+}
+
+.btn-lg, .btn-group-lg > .btn {
+  padding: 7px 16px;
+}
+
+.question-view, .voting-graphs, .current-proposals, #completed_box {
+	display: none;
+}
+
+.participant.author {
+	color: blue;
+}
+.participant.pending {
+	font-style: italic;
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 970px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .jumbotron {
+        padding: 20px 0px;
+    }
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+td.verthdr {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+
+td.grey {
+	background-color: #f5f5f5;
+	color: white;
+}
+td.red {
+	background-color: #FF0000;
+	color: white;
+}
+td.amber {
+	background-color: #FFBF00;
+}
+td.green {
+	background-color: #66CD00;
+}
+#participationtable th {
+	background-color: #D3D3D3;
+}
+
+#inputAgainstComment, #inputForComment,
+#inputQuestionComment, .inputAnswerComment {
+	width: 85%;
+}
+
+.alglink {
+	display: none;
+}
+
+.alert {
+	.flash {
+		font-weight: bold;
+	}
+	.message {
+		display: none;
+	}
+}
+
+.alert a {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+.alert.main {
+	margin-bottom: 5px; 
+}
+
+.well {
+	margin-bottom: 0px;
+}
+
+.well .blurb {
+	font-size: 1.1em;
+}
+
+.guide {
+	font-size: 1.2em;
+}
+
+.graphs {
+	.container-fixed();
+	/*border-radius: 5px;
+	border: 1px solid #668B8B;*/
+	border: none;
+	.graphcontainer {
+	  .leftgraph {
+		height: @graph-height;
+		width: 49%;
+		float: left;
+	  }
+	  .rightgraph {
+		height: @graph-height;
+		float: right;
+		width: 49%;
+	  }
+	}
+	.singlegraph {
+		display: none;
+		height: @graph-height;
+		width: 100%;
+		backgound-color: red;
+	}
+}
+
+.well.highlight {
+}
+
+.proposalgroup text{
+	cursor: pointer;
+}
+
+.errormsg {
+	color: red;
+}
+
+#votenowwindow .modal-dialog
+{
+  width: 60%;
+  height: 100% !important;
+  overflow-y: hidden;
+}
+#modalvotesmap {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: #e5e5ff;
+}
+#modalvotesmapcontainer {
+	width: 100%;
+	margin: 0;
+	padding: 10px;
+	padding-bottom: 15px;
+	background-color: #CDCDCD;
+	position: relative;
+}
+#modalvotesmapcontainer .right {
+	float: right;
+	color: green;
+}
+#modalvotesmapcontainer .left {
+	color: red;
+}
+#modalvotesmapcontainer .middle {
+	position: absolute;
+	top: 5px;
+	right: 43%;
+	color: yellow;
+}
+#modalvotesmapcontainer .foot {
+	position: absolute;
+	bottom: 0;
+	right: 40%;
+	color: blue;
+}
+#modalvotesmapcontainer .label {
+	font-size: 1.em;
+	font-weight: bold;
+}
+
+#results_map {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+line.med.hidden, .medlabel.hidden {
+	display: none;
+}
+
+circle.med {
+	fill: #BEBEBE;
+}
+line.med {
+	stroke: #BEBEBE;
+}
+circle.med_marker {
+	fill: #7e7e7e;
+}
+circle.med.pareto {
+	fill: #FFA500;
+}
+line.med.pareto {
+	stroke: #ffff00;
+}
+circle.med_marker.pareto {
+	fill: #B77600;
+}
+
+#resultstriangle {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.votesmap {
+	width: 70%;
+	height: 500px;
+	border: 1px solid grey;
+	margin: auto, 0;
+}
+
+#cvtriangle {
+	width: 100%;
+	height: 100%;
+	border: 1px solid grey;
+}
+
+.prop_link {
+	margin: 0 5px;
+	padding: 0 5px;
+	background-color: green;
+	color: white;
+	cursor: pointer;
+	width: 100px;
+}
+
+.user_link {
+	margin: 0;
+	padding: 0 5px;
+	background-color: blue;
+	color: white;
+	cursor: pointer;
+}
+
+.partial2full {
+	color: blue;
+}
+
+#fullquestionblurb .question_text {
+	overflow: auto;
+	height: 300px;
+}
+
+
+.keyplayer {
+	p {
+		margin: 0;
+		padding: 0;
+	}
+	margin: 10px auto;
+	background-color: #E0EEEE;
+	border: #C0D9D9	1px solid;
+	/* border-radius: 5px; */
+	width: 600px;
+	padding: 10px;
+	.votegroup {
+		margin: 10px 0;
+		border: 1px solid #E0FFFF;
+		/* border-radius: 5px; */
+		padding: 5px;
+		padding-left: 15px;
+	}
+}
+
+.vote_button {
+	width: 75px;
+	height: 75px;
+	border: 1px solid blue;
+}
+
+.counter{
+	font-size:1em;
+	font-weight:bold;
+	color:green;
+}
+.warning{
+	color:blue;
+}	
+.exceeded{
+	color:#e00;
+}
+
+.panel.endorse {
+	.panel-success;
+}
+.panel.notvoted {
+	.panel-default;
+}
+.panel.confused {
+	.panel-info;
+}
+.panel.oppose {
+	.panel-danger;
+}
+
+.select_comment button {
+	color: #d3d3d3;
+}
+.select_comment.supports button {
+	.btn-success;
+}
+
+.proposal_list_item {
+  .make-row();
+  .voting_history {
+    .make-md-column(1);
+  }
+  .proposal_details {
+    .make-md-column(9);
+  }
+  .voting_choice {
+    .make-md-column(2);
+  }
+}
+
+.map_guide {
+	@media (max-width: 500px) 
+	{
+    	display: none;
+	}
+}
+
+#votemapwindow 
+{
+  .modal-dialog {
+	 width: 63%;
+     /*height: 800px !important;*/
+     overflow-y: hidden;
+
+	@media (max-width: 500px) 
+	{
+    	width: 100%;
+	}
+
+	 .modal-body {
+     }
+  }
+  z-index: 5000;
+}
+
+#viewproposal .modal-dialog
+{
+  width: 90%;
+  height: 100% !important;
+  overflow-y: hidden;
+}
+
+#viewproposal .vpheader.oppose
+{
+	color: #b94a48;
+	background-color: #f2dede;
+	border-top-color: #ebccd1;
+	border-right-color-value: #ebccd1;
+	border-bottom-color: #ebccd1;
+	border-left-color-value: #ebccd1;
+}
+#viewproposal .vpheader.endorse
+{
+	color: #468847;
+	background-color: #dff0d8;
+	border-top-color: #d6e9c6;
+	border-right-color-value: #d6e9c6;
+	border-bottom-color: #d6e9c6;
+	border-left-color-value: #d6e9c6;
+}
+#viewproposal .vpheader.confused
+{
+	color: #3a87ad;
+	background-color: #d9edf7;
+	border-top-color: #bce8f1;
+	border-right-color-value: #bce8f1;
+	border-bottom-color: #bce8f1;
+	border-left-color-value: #bce8f1;
+}
+
+.comment .select_comment {
+    position: absolute;
+    top: 0;
+    right: -27px;
+    width: 25px;
+    height: 25px;
+}
+.likes
+{
+  position: absolute;
+  bottom: 3px;
+  left: 5px;
+  font-size: 0.8em;
+  color: green;
+}
+
+#voting_graphs {
+	display: none;
+}
+
+.newcommentpanel {
+	height: 300px;
+	width: 97%;
+	margin-bottom: 5px;
+	display: none;
+	background-color: #E0EEEE;
+	left: 5px;
+  	position: absolute;
+	z-index: 1000;
+}
+.newcomment {
+	padding: 5px;
+}
+
+#proposalcomments, #propdetails {
+	font-size: 1.1em;
+}
+
+#viewproposal .controls {
+	margin-top: 10px;
+}
+
+#showcomments {
+	display: none;
+}
+#showquestions {
+	display: none;
+}
+
+#propdetails, #showcomments, #showquestions {
+	height: 300px;
+	/*min-height: 300px;*/
+	margin-bottom: 5px;
+	/*background-color: grey;*/
+}
+
+#showcomments .comments {
+	height: 270px;
+	overflow: scroll;
+}
+
+#showquestions .comments {
+	height: 270px;
+	overflow: scroll;
+}
+
+.qabox {
+	margin-bottom: 5px;
+}
+
+.question-blurb {
+	cursor: pointer;
+}
+.question-blurb.over {
+	background-color: #668B8B;
+	color: #FFF;
+}
+a.plain {
+	text-decoration: none;
+}
+
+
+.questions2 {
+	min-height: 100px;
+}
+.questions2.writing {
+	background-color: #cdffcc;
+}
+.questions2.voting {
+	background-color: #c5e0fb;
+}
+.questions2.consensus {
+	background-color: #ffffcb;
+}
+
+.tooltip-inner {
+	max-width: 300px;
+	font-size: 1.1em;
+	text-align: left;
+	background-color: #E8E8E8;
+	color: #000;
+	padding: 10px;
+	div {
+		margin-bottom: 5px;
+		color: blue;
+	}
+}
+
+.panel-title.proposal {
+	cursor: pointer;
+}
+
+.all-questions .panel-title {
+	text-align: center;
+	font-weight: bold;
+	font-size: 1.1em;
+}
+.all-questions .panel-body {
+	min-height: 100px;
+}
+.all-questions .panel-heading {
+	text-align: center;
+}
+.all-questions .panel-heading a {
+	margin-top: 10px;
+}
+
+#main_intro, #invited_intro {
+	display: none;
+}
+
+.emphasisze {
+	font-size: 1.3em;
+	font-weight: bold;
+}
+
+.right {
+	float: right;
+}
+
+.assoc_list .selected {
+	color: green;
+	font-weight: bold;
+	background: #A6D785;
+}
+
+.all-questions {
+	.item {
+		padding: 10px;
+		cursor: pointer;
+	}
+	.row {
+		/*min-height: 100px;*/
+	}
+	.icons {
+		min-height: 100px;
+		/*height: 100%;
+		margin: 0;*/
+	}
+	.icons.new {
+		background-color: #c5edc5;
+	}
+	.icons.writing {
+		background-color: #f0c1bb;
+	}
+	.icons.voting {
+		background-color: #c0d2d7;
+	}
+	.icons.consensus {
+		background-color: #eeeeee;
+	}
+	.icons.panel {
+		min-height: 100px;
+	}
+}
+
+.all-questions {
+	[class*="col-"]{
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
+	}
+
+	.row{
+	    overflow: hidden; 
+	}
+	.col-md-12.icons.consensus {
+		min-height: 100px;
+	}
+}
+
+
+
+.comments .comment {
+	/* border-radius: 5px; */
+	margin-bottom: 5px;
+	padding: 3px;
+	min-height: 50px;
+    height: 90px !important;
+	width: 85%;
+	position: relative;
+	padding-bottom: 20px;
+}
+
+
+.comments .comment.for {
+	border: 1px solid green;
+}
+.comments .comment.against {
+	border: 1px solid red;
+}
+.comments .comment.question, .comments .comment.answer {
+	border: 1px solid blue;
+}
+.comments .comment.no-answer {
+	border: 1px solid grey;
+}
+
+.hidden {
+	display: none;
+}
+
+.qaheaders {
+	margin-top: -20px;
+}
+
+#showcomments .comments .comment {
+	/* border-radius: 5px; */
+	margin-bottom: 10px;
+	padding: 10px;
+}
+#showcomments .comments .comment.for {
+	border: 2px solid green;
+}
+#showcomments .comments .comment.against {
+	border: 2px solid red;
+}
+
+.proposal_row {
+	.make-row();
+	.proposal {
+    	.make-md-column(4);
+  }
+}
+
+.message {
+	display: none;
+}
+
+.alert_container {
+	height: 60px;
+}
+
+
+/* Graph */
+.myprop {
+	stroke: red;
+}
+.pf {
+	stroke: green;
+}
+/* arrow */
+.arrow.voted path {
+	stroke: red;
+}
+
+/* navbar */
+.navbar-nav > li > a { 
+    line-height: 0.9em;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.navbar {
+	min-height:60px !important;
+	height:60px !important;
+}
+
+.proposal-blurb, .question-blurb {
+	height: 120px;
+	overflow-y: scroll;
+}
+
+#addquestion .recaptcha, #editquestion .recaptcha {
+	display: none;
+}
+
+.proposal-footer {
+	height: 50px;
+}
+
+.proposal-footer img{
+	margin: 0;
+	padding: 0;
+	margin-top: -5px;
+	margin-left: 5px;
+}
+
+
+.votebox {
+	width: 75px; 
+	height: 75px;
+	cursor: pointer;
+	float: right;
+	position: absolute;
+	top: 5px;
+	right: 45px;
+}
+
+.vptitle, #viewproposal .controls {
+	padding-left: 5%;
+}
+
+.proposal_list .voting {
+	width: 45px; 
+	height: 45px;
+	cursor: pointer;
+	float: right;
+	margin-top: -9px;
+	margin-right: -12px;
+}
+
+a {
+	cursor: pointer;
+}
+
+.poptriangle {
+	width: 150px;
+	height: 150px;
+	background-color: #E0EEEE;
+}
+
+
+/* Graphs */
+.arrow.voted polygon {
+	stroke: red;
+	fill: red;
+}
+
+/* user */
+.user.currentuser.voted polygon {
+	fill: red
+}
+.user.currentuser.voted text {
+	fill: white
+}
+/* proposal, proposalgroup */
+.proposal.voted polygon, .proposalgroup.voted polygon {
+	stroke: red;
+}
+/* usergroup */
+/* .usergroup.voted > polygon:first-of-type { */
+.usergroup.currentuser.voted title:first-child + polygon {
+	stroke: red;
+}
+.usergroup.currentuser.voted a.currentuserlink polygon {
+	fill: red;
+} 
+.usergroup.currentuser.voted a.currentuserlink text {
+	fill: white
+}
+.usergroup.currentuser.voted a.currentuserlink {
+	background-color: red;
+}
+
+.triangle {
+	width: 305px;
+	height: 215px;
+	background-color: white;
+	margin-top: 20px;
+	padding-top: 2px;
+}
+
+.showtriangle {
+	width: 510px;
+	height: 410px;
+	background-color: #E0EEEE;
+}
+.show3waytriangle {
+	width: 400px;
+	height: 400px;
+	background-color: #E0EEEE;
+}
+
+
+.proposal_list_item .panel-body {
+	height: 100px;
+}
+
+.votenow {
+	cursor: pointer;
+}
+
+.authorname {
+	font-style: italic;
+}
+
+.voting_choice {
+	vertical-align: middle;
+	padding-top: 30px;
+}
+.voting_history {
+	vertical-align: middle;
+	padding-top: 50px;
+}
+
+.nav .btn {
+	color: #FFFFFF;
+}
+
+#inputSearch {
+	color: black;
+	width: 300px;
+	height: 40px;
+	line-height: 40px;
+}
+ .nav li {
+	margin-top: 10px;
+}
+
+#navlogin, #navregister, .navbutton {
+	color: #FFFFFF !important;
+	/* margin-top: 5px; */
+	margin-right: 10px;
+	font-weight: bold;
+}
+
+.navlogout {
+  background-color: #222222;
+  border: none;
+}
+
+.navlogout:hover {
+  background-color: #ffffff;
+  color: #222222 !important;
+  border: none;
+}
+
+.questicon {
+	font-size: 1.8em;
+}
+
+.notificationicon {
+	font-size: 1.5em;
+	color: blue;
+}
+
+.note {
+	color: blue;
+}
+
+#fullquestionblurb .question_text {
+	margin-bottom: 20px;
+}
+
+.new .glyphicon-tree-deciduous {
+	color: green;
+}
+
+.writing .glyphicon-tree-deciduous {
+	color: red;
+}
+
+.consensus .glyphicon-tree-deciduous {
+	color: orange;
+}
+
+.questhdricon {
+	font-size: 2em;
+}
+
+.modal-body .intro {
+	padding: 0 15px;
+	margin-bottom: 20px;
+	font-size: 1.1em;
+}
+
+.message-container {
+	height: 70px;
+	margin: 0;
+	padding: 0;
+}
+
+.navbar > .container .navbar-brand
+{
+	font-size: 2em;
+	padding: 0 auto;
+}
+
+.emails_semt {
+	color: green;
+	padding: 2px;
+}
+
+.emails_rejected {
+	color: red;
+	padding: 2px;
+}
+
+.emails_already_sent {
+	color: orange;
+	padding: 2px;
+}
+
+a.disabled {
+	color: grey;
+}
+
+#add_users.modal, participants.modal {
+	overflow: scroll;
+}
+
+.no-gutter > [class*='col-'] {
+    padding-right:0;
+    padding-left:0;
+}
+
+.useravatar, .userdata {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+
+.user_data p {
+	padding: 0 auto;
+	margin: 0 auto;
+}
+.user_data .status {
+	font-style: italic;
+}
+.user_data h4 {
+	font-style: italic;
+}
+
+.row.user_data {
+	margin-left: 0;
+    margin-right: 0;
+	padding: 0;
+}
+.user_data ul {
+	list-style-type: none;
+	margin: 0;
+    padding: 0;
+	display: inline;
+}
+.user_data ul li {
+	margin: 0;
+    padding: 0;
+}
+
+#propdetails {
+	overflow: auto;
+}
+.progress {
+	margin-bottom: 0px;
+}
+
+.draggable {
+	cursor: pointer;
+}
+
+#avatar_placeholder {
+	width: 200px;
+	height: 200px;
+	background-color: grey;
+}
+
+.upload_image_placeholder {
+	width: 200px;
+	height: 200px;
+	background-color: grey;
+}
+
+.selected_upload_image {
+	margin-bottom: 10px;
+}
+
+#selected_image {
+	margin-bottom: 10px;
+}
+
+#clearvotes {
+	
+}
+
+.proposal-footer .glyphicon-triangle-bottom {
+	font-size: 2em;
+}
+
+.resultsmapcontrols {
+	margin-bottom: 10px;
+}

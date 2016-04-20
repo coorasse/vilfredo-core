@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<!--
+****************************************************************************
+#
+# This file is part of the Vilfredo Client.
+#
+# Copyright © 2009-2014 Pietro Speroni di Fenizio / Derek Paterson.
+#
+# VilfredoReloadedCore is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation version 3 of the License.
+#
+# VilfredoReloadedCore is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License
+# for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with VilfredoReloadedCore.  If not, see <http://www.gnu.org/licenses/>.
+#
+****************************************************************************
+-->
+<html lang="en"> 
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Vilfredo - Fair Decision-Making</title>
+        <meta name="description" content="Vilfredo allows groups from 5 to 20 people to ask open questions and reach consensus in a easy and fair way.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-title" content="Vilfredo">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--
+		<link rel="stylesheet" type="text/css" href="static/bootstrap/dist/css/bootstrap.css"/>
+		-->
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='custom-styles/styles.css') }}">
+		<!--
+		<link rel="stylesheet/less" type="text/css" href="static/custom-styles/custom-bootstrap.less"/>
+		-->
+		<!-- HTML5 shim and Respond.js IE8 agree of HTML5 elements and media queries -->
+    	<!--[if lt IE 9]>
+      	<script src="static/bootstrap/docs-assets/js/html5shiv.js"></script>
+      	<script src="static/bootstrap/docs-assets/js/respond.min.js"></script>
+    	<![endif]-->
+		
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery/1.10.2/jquery.min.js') }}"></script>
+    	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-migrate.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='bootstrap/dist/js/bootstrap.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout-3.2.0.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout-mapping-debug.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/svg-1.5.0/jquery.svg.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/svg-1.5.0/jquery.svgdom.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/svg-1.5.0/jquery.svganim.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/cookies/jquery.cookie.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/purl-master/purl.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/charCount.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/settings.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/graph.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/vga.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/knockout.validation.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/jqBootstrapValidation.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='js/ie-row-fix.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='localization/en-US.js') }}"></script>
+		{{ flask_util_js.js }}
+    </head>
+    <body>
+	<div id="navbar"></div>
+
+	<div class="container main">
+
+		<div class="question-view">
+		<div class="page-header question-info">
+			<h1 data-bind="text: title"></h1>
+			<h5>by <span class="authorname" data-bind="text: author"></span></h5>
+			<h4>Generation <span data-bind="text: generation"></span>: <span data-bind="text: phase"></span> phase.</h4>
+			<p><span data-bind="text: time_dhm(get_timestamp()-last_move_on())"></span> has passed since last moved on.</p>
+		</div>
+		<div class="panel question-info">
+			<div class="well">
+				<span class="blurb" data-bind="html: blurb"></span>
+				<span data-bind="visible: phase() == 'writing'">
+				<br><br>
+				<a data-toggle="modal" data-target="#addproposal" class="btn btn-primary btn-lg active" role="button">Answer</a></span>	
+			</div>
+		</div>
+		</div>
+		<!-- question-view end -->
+		
+		<div id="keyplayer_info">
+		<!-- ko if: key_players().length --> <!-- 0 -->
+		<div class="keyplayers">
+			<h2>Key Players</h2>
+			<p>There are currently <strong><span data-bind="text: key_players().length"></span> Key Players</strong>, though this can change at any moment as people change their votes.</p>
+			<p>Key Players are users who if they were to vote for a proposal they currently disagree with or do not understand then we would move closer to reaching a consensus (i.e. the number of winning proposals accepted by everyone would decrease).</p>
+			
+			<!-- ko if: getUserKeyPlayerInfo() -->
+			<div data-bind="with: getUserKeyPlayerInfo()">
+			<div class="keyplayer" data-bind="with: add_vote">
+				<h4>Hey <span class="user_link" data-bind="text: currentUserViewModel.username"></span> you are a key player!</h4>
+					<!-- ko if: notvoted.length -->
+					<div class="votegroup">
+					<p>You have not yet voted for these proposals: 
+					<!-- ko foreach: notvoted --><!-- 2 -->
+					<span data-bind="text: $data, click: $root.showProposalNode.bind($data)" class="prop_link"></span>
+					<!-- /ko --><!-- 2 -->
+					</p>
+					<p>Perhaps you could do so?</p>
+					</div>
+					<!-- /ko -->
+					
+					<!-- ko if: oppose.length -->
+					<div class="votegroup">
+					<p>You voted against these proposals: 
+					<!-- ko foreach: oppose --><!-- 2 -->
+					<span data-bind="text: $data, click: $root.showProposalNode.bind($data)" class="prop_link"></span>
+					<!-- /ko --><!-- 2 -->
+					</p>
+					<p>Please make sure none of these proposals are acceptable to you.</p>
+					</div>
+					<!-- /ko -->
+					
+					<!-- ko if: confused.length -->
+					<div class="votegroup" data-bind="if: confused.length">
+					<p>You do not understand these proposals: 
+					<!-- ko foreach: confused --><!-- 2 -->
+					<span data-bind="text: $data, click: $root.showProposalNode.bind($data)" class="prop_link"></span>
+					<!-- /ko --><!-- 2 -->
+					</p>
+					<p>Click on a proposal and open the Questions panel to read questions asked by other users and the author's replies. Or else click on the Ask Question link to ask the proposal author a question of your own. Hopefully he can clarify things for you.</p>
+					</div>
+					<!-- /ko -->
+				</p>
+			</div>
+			</div>
+			<!-- /ko -->
+			
+			<!-- ko if: key_players().length -->
+			<h4>Other Key Players</h4>
+			<!-- /ko -->
+			
+			<!-- ko foreach: key_players --> <!-- 1 -->
+			<!-- ko ifnot: id() == currentUserViewModel.userid() -->
+			<div class="keyplayer" data-bind="with: add_vote">
+				<p>User <span class="user_link" data-bind="text: $parent.username"></span></p>
+					<!-- ko if: notvoted.length -->
+					<div class="votegroup">
+					<p>Has not yet voted for these proposals: 
+					<!-- ko foreach: notvoted --><!-- 2 -->
+					<span data-bind="text: $data, click: $root.showProposalNode.bind($data)" class="prop_link"></span>
+					<!-- /ko --><!-- 2 -->
+					</p>
+					<p>Perhaps you could remind him to do so?</p>
+					</div>
+					<!-- /ko -->
+					
+					<!-- ko if: oppose.length -->
+					<div class="votegroup">
+					<p>Has voted against these proposals: 
+					<!-- ko foreach: oppose --><!-- 2 -->
+					<span data-bind="text: $data, click: $root.showProposalNode.bind($data)" class="prop_link"></span>
+					<!-- /ko --><!-- 2 -->
+					</p>
+					<p>Perhaps you could make him change his mind?</p>
+					</div>
+					<!-- /ko -->
+					
+					<!-- ko if: confused.length -->
+					<div class="votegroup" data-bind="if: confused.length">
+					<p>Does not understand these proposals: 
+					<!-- ko foreach: confused --><!-- 2 -->
+					<span data-bind="text: $data, click: $root.showProposalNode.bind($data)" class="prop_link"></span>
+					<!-- /ko --><!-- 2 -->
+					</p>
+					<p>Perhaps you could help him?</p>
+					</div>
+					<!-- /ko -->
+				</p>
+			</div>
+			<!-- /ko --> <!-- if not current user -->
+			<!-- /ko --> <!-- 1 -->
+			
+		</div>
+		<!-- /ko --> <!-- 0 -->
+		</div>
+
+		
+		<div id="generation_selector">
+		<div class="page-header">
+			<h1>
+				Analysing Generation <span data-bind="text: selected_generation"></span> Algorithm <span data-bind="text: selected_algorithm"></span>
+			</h1>
+		</div>
+		<br>
+		<div class="controls text-center">	
+		<h3>Select from available generations below.</h3>
+		<!-- ko foreach: allGenerations -->
+		<button rel="tooltip" data-bind="visible: $parent.hasConfusedVotes($data), text: $data, click: function(){ $parent.fetchTablesForSelectedGeneration($data); }, attr: {title: $parent.alternateVotes($data)}" type="button" class="btn btn-md btn-info"></button>
+		<!-- /ko -->
+		</div>
+		</div>
+		<!-- 
+		generation_selector end
+		-->
+		
+		<br>
+		<div id="algorithm_selector" class="controls text-center">
+			<h3>Select the algorithm to use.</h3>
+			  <button data-bind="click: function(){ fetchTablesForSelectedAlgorithm(1); }" id="simplelevels" type="button" class="btn btn-md btn-info">Simple</button>
+			  <button data-bind="click: function(){ fetchTablesForSelectedAlgorithm(2); }" id="complexlevels" type="button" class="btn btn-md btn-info">Complex</button>
+		</div>
+		<br>
+		
+		
+		<!-- Graphs -->
+		<div class="voting-graphs">
+		<br>
+		<div class="graphs">
+			<div class="singlegraph"></div>
+			<div class="graphcontainer">
+				<div id="votesgraph" class="leftgraph"></div>
+				<div id="pfgraph" class="rightgraph"></div>
+			</div>
+		</div>
+		</div>
+		<!-- Graphs end -->
+		
+		
+		
+		
+		<!-- 
+		domination_table start
+		-->
+		<div id="domination_table">
+		
+		
+		
+		<br>
+		<br>
+		
+		<div class="page-header">
+			<h1>
+				Domination Table - Generation  <span data-bind="text: selected_generation"></span> Algorithm <span data-bind="text: dom_table_algorithm"></span>
+			</h1>
+			<h4 data-bind="text: alternateVotes(selected_generation())"></h4>
+		</div>
+		<br>
+		<div class="controls text-center">
+			  <button data-bind="click: function(){ fetchDominationMap(1); }" id="simplelevels" type="button" class="btn btn-md btn-info">Simple</button>
+			  <button data-bind="click: function(){ fetchDominationMap(2); }" id="complexlevels" type="button" class="btn btn-md btn-info">Complex</button>
+		</div>
+		<br>
+			
+			<table class="table" width="647">
+			<thead>
+			<tr>
+			<th>PID</th>
+			<!-- ko foreach: domination_map_array -->
+			<th data-bind="text: id"></th>
+			<!-- /ko -->
+			</tr>
+			</thead>
+			<tbody>
+			<!-- ko foreach: domination_map_array -->
+			<tr>
+				<td rel="tooltip" class="verthdr" data-bind="text: id, attr: {title: $root.proposalVoting(id)}" title="Here are this proposals votes"></td>
+				<!-- ko foreach: dominations -->
+				<td data-bind="html: $data"></td>
+				<!-- /ko -->
+			</tr>
+			<!-- /ko -->
+			</tbody>
+			</table>
+		</div>
+		<!-- 
+		domination_table end
+		-->
+		
+		
+		<table>
+		<thead>
+		<tr>
+		<th colspan="2">Key</th>
+		</tr>
+		<tbody>
+		<tr>
+		<td class="verthdr">&equiv;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>Same or equivalent proposal</td>
+		</tr>
+		<tr>
+		<td class="verthdr">&approx;</td><td>Same supporters</td>
+		</tr>
+		<tr>
+		<td class="verthdr">&hellip;</td><td>No qualified voters</td>
+		</tr>
+		<tr>
+		<td class="verthdr">^</td><td>Dominates</td>
+		</tr>
+		<tr>
+		<td class="verthdr"><</td><td>Dominated</td>
+		</tr>
+		<tr>
+		<td class="verthdr">&uHar;</td><td>Dominates (Partial)</td>	
+		</tr>
+		<tr>
+		<td class="verthdr">&lHar;</td><td>Dominated (Partial)</td>	
+		</tr>
+		<tr>
+		<td class="verthdr partial2full">^</td><td>Dominates (Partial=>Full)</td>
+		</tr>
+		<tr>
+		<td class="verthdr partial2full"><</td><td>Dominated (Partial=>Full)</td>
+		</tr>
+		</tbody>
+		</table>
+		<!-- 
+		domination_table end
+		-->
+		
+		<!-- 
+		domination levels start
+		-->
+		<div id="domination_levels_table">
+		<div class="page-header">
+			<h1>
+				Levels Table - Generation  <span data-bind="text: selected_generation"></span> Algorithm <span data-bind="text: levels_table_algorithm"></span>
+			</h1>
+		</div>
+		
+		<br>
+		<div class="controls text-center">	
+			  <button data-bind="click: function(){ fetchLevelsMap(1); }" id="simpledom" type="button" class="btn btn-md btn-info">Simple</button>
+			  <button data-bind="click: function(){ fetchLevelsMap(2); }" id="complexdom" type="button" class="btn btn-md btn-info">Complex</button>
+		</div>
+		<br>
+			
+			<table class="table" width="647">
+			<thead>
+			<tr>
+			<th>PID</th>
+			<th>Dominates</th>
+			<th>Dominated</th>
+			<th>PF Dominated</th>
+			</thead>
+			<tbody>
+			<!-- ko foreach: levels_map -->
+			<tr>
+				<td class="verthdr" data-bind="text: id"></td>
+				<td data-bind="text: levels.dominated"></td>
+				<td data-bind="text: levels.dominates"></td>
+				<td data-bind="html: levels.pf_dominated"></td>
+			</tr>
+			<!-- /ko -->
+			</tbody>
+			</table>
+		</div>
+		<!-- 
+		domination_table end
+		-->
+		
+		
+		<!-- 
+		Inherited Proposals 
+		-->
+		<div data-bind="visible: questionViewModel.phase() == 'writing' && questionViewModel.generation() > 1" class="inherited_proposals narrow">
+			
+		<div class="page-header">
+			<h1>
+				Inherited Proposals
+			</h1>
+			<h3>These proposals were inherited from the previous generation:</h3>
+		</div>
+			
+		<div class="proposal_list row">
+			<!-- ko foreach: inherited_proposals -->
+			<div class="proposal col-md-4">
+			<input data-bind="value: id" type="hidden" class="propId" value="">
+			<input data-bind="value: $index" type="hidden" class="index" value="">
+     		<input data-bind="value: author" type="hidden" class="author" value="">
+			<input data-bind="value: uri" type="hidden" class="uri" value="">
+			<div data-bind="css: endorse_type" class="panel">
+				<div class="panel-heading">
+					<h3 class="panel-title" data-bind="text: title"></h3>
+				</div>
+				<div class="panel-body proposal-blurb">
+					<span data-bind="html: blurb"></span>
+				</div>
+				<div class="panel-footer proposal-footer">
+					<!--<button data-bind="click: $parent.read" type="button" class="btn btn-s btn-primary">Read</button>-->
+					<a title="Open proposal window" data-bind="click: $parent.read.bind($data, $index())"><span class="glyphicon glyphicon-new-window"></span></a>&nbsp;&nbsp;
+					<a title="Open comments window" data-bind="click: $parent.read.bind($data, $index())"><span class="glyphicon glyphicon-comment"></span>&nbsp;<span data-bind="text: comment_count"></span></a>&nbsp;&nbsp;
+					<a title="Open questions window" data-bind="click: $parent.read.bind($data, $index())"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<span data-bind="text: question_count"></span></a>
+				</div>
+			</div>
+			</div><!-- /ko -->
+		</div>
+		</div>
+		<!-- 
+		Inherited Proposals End
+		-->
+		
+				
+		<!-- 
+		Current Proposals 
+		-->
+		<div class="proposals narrow">
+		
+		<div class="current-proposals">
+		<div data-bind="visible: questionViewModel.phase() == 'voting'" class="page-header">
+			<h1>
+				Current Proposals
+			</h1>
+			<h3 data-bind="visible: proposals().length > 0">Vote on the ones you agree with:</h3>
+		</div>
+		<div data-bind="visible: questionViewModel.phase() == 'writing'" class="page-header">
+			<h1>
+				Your New Proposals
+			</h1>
+			<h3 data-bind="visible: proposals().length > 0">Below are the proposals you have created during the writing phase of this generation:</h3>
+		</div>
+		
+		<div data-bind="visible: proposals().length == 0 && questionViewModel.phase() == 'writing'" class="well highlight">
+		<p>There are no proposals so far. Why not be the first to propose an answer?</p>
+		<a data-toggle="modal" data-target="#addproposal" class="btn btn-primary btn-lg active" role="button">Answer</a>
+		</div>
+		
+		<div class="proposal_list row">
+			<!-- ko foreach: proposals -->
+			<div class="proposal col-md-4">
+			<input data-bind="value: id" type="hidden" class="propId" value="">
+			<input data-bind="value: $index" type="hidden" class="index" value="">
+     		<input data-bind="value: author" type="hidden" class="author" value="">
+			<input data-bind="value: uri" type="hidden" class="uri" value="">
+			<div data-bind="css: endorse_type" class="panel">
+				<div class="panel-heading">
+					<h3 class="panel-title" data-bind="text: title"></h3>
+				</div>
+				<div class="panel-body proposal-blurb">
+					<span data-bind="html: blurb"></span>
+				</div>
+				<div class="panel-footer proposal-footer">
+					<a title="Open proposal window" data-bind="click: $parent.read.bind($data, $index())"><span class="glyphicon glyphicon-new-window"></span></a>&nbsp;&nbsp;
+					<a title="Open comments window" data-bind="click: $parent.read.bind($data, $index())"><span class="glyphicon glyphicon-comment"></span>&nbsp;<span data-bind="text: comment_count"></span></a>&nbsp;&nbsp;
+					<a title="Open questions window" data-bind="click: $parent.read.bind($data, $index())"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<span data-bind="text: question_count"></span></a>
+					<!-- <a data-toggle="modal" data-target="#votemapwindow">votemap</a> -->
+					<!-- <a data-bind="click: $parent.openvotemap.bind($data, $index())">votemap</a> -->
+					<!--
+					<button data-bind="click: $parent.endorse.bind($data, 'endorse')" type="button" class="btn btn-xs btn-success">Endorse</button>
+					<button data-bind="click: $parent.endorse.bind($data, 'oppose')" type="button" class="btn btn-xs btn-danger">Oppose</button>
+					<button data-bind="click: $parent.endorse.bind($data, 'confused')" type="button" class="btn btn-xs btn-primary">Confused</button>
+					-->
+					<!--<div data-toggle="modal" data-target="#votemapwindow" class="pull-right voting"></div>-->
+					 <!--<a data-toggle="popover" data-placement="top" rel="popover" title="">popover</a>-->
+					<!--<div data-bind="click: $parent.show3WayTriangle" class="pull-right voting"></div>-->
+					<!--
+					<a data-toggle="popover" data-placement="top" rel="popover" title="">
+					<div class="voting"></div>
+					</a>
+					-->
+					<div data-bind="click: $parent.openvotemap.bind($data, $index())" class="voting"></div>
+					<!--
+					<a data-toggle="popover" data-placement="top" rel="popover" title="">
+					<img src="static/images/triangle.svg" width="40" height="40" alt="">
+					</a>
+					-->
+				</div>
+			</div>
+			</div><!-- /ko -->
+		</div>
+		</div>
+		<!-- 
+		Current Proposals End
+		-->
+		
+	</div><!-- /container -->
+
+
+	<div id="footer"></div> <!-- page end -->
+	
+	
+	<!-- Tri Voting Modal -->
+	<div id="vote3waywindow" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="VoteNowBox" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-bind="click: close3WayTriangle" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title">Please Vote</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="show3waytriangle"></div>
+		  </div><!-- /.modal-body -->
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
+
+	<!-- Continuous Voting Modal -->
+	<div id="votemapwindow" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="VoteNowBox" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content"> 
+	      <div class="vpheader modal-header"> <!-- add here -->
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<p class="modal-title"><span id="votemap-thisprop"></span></p>
+	      </div>
+	      <div class="modal-body">
+			<div id="modalvotesmap"></div>
+		  </div><!-- /.modal-body -->
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	
+	<!-- View Proposal Modal -->
+	<div data-bind="with: proposal" id="viewproposal" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="ViewProposalBox" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div data-bind="css: endorse_type" class="vpheader modal-header">
+			<div data-bind="click: openvotemap.bind($data)" class="votebox"></div>
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="vptitle modal-title" data-bind="text: title"></h4>
+			<div class="controls">
+			<a data-bind="click: showProposalContent"><span class="glyphicon glyphicon-file"></span> Proposal</a>&nbsp;&nbsp;&nbsp;
+			<a data-bind="click: showProposalComments"><span class="glyphicon glyphicon-comment"></span> Comments</a>&nbsp;&nbsp;&nbsp;
+			<a data-bind="click: showProposalQuestions"><span class="glyphicon glyphicon-question-sign"></span> Questions</a>
+			<!-- ko if: questionViewModel.phase() == 'voting' -->
+			&nbsp;&nbsp;&nbsp;
+			<a title="Add a point for or against" data-bind="click: beginNewComment.bind($data, 'comment')"><span class="glyphicon glyphicon-plus-sign"></span> Add Comment</a>
+			<!-- /ko -->
+			<!-- ko if: $data.author_id() != currentUserViewModel.userid() && questionViewModel.phase() == 'voting' -->
+			&nbsp;&nbsp;&nbsp;
+			<a title="Ask the author of this proposal a question" data-bind="click: beginNewComment.bind($data, 'question')"><span class="glyphicon glyphicon-question-sign"></span> Ask Question</a>
+			<!-- /ko -->
+			</div> <!-- controls -->
+	      </div><!-- modal-header -->
+	      <div id="viewproposalbody" class="modal-body">
+		   <div>				
+			<!-- New comment panel -->
+			<div class="newcommentpanel">
+				<div class="message alert alert-danger"></div>
+				<div class="newcomment">
+					<h4>
+						Add a point for or against this proposal
+					</h4>
+					<form autocomplete="off" class="form-horizontal" role="form">
+						<input type="hidden" id="new_comment_type" value="comment" />
+						<input type="hidden" id="reply_to" value=0 />
+						<div id="form-type-select" class="form-group">
+							<label for="inputCommentType" class="col-sm-2 control-label">Comment Type</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: comment_type"></span>
+								<select data-bind="options: comment_type_options, value: comment_type, optionsCaption: 'Select Comment Type...'" id="inputQuestionMinMoveTime"></select>
+									
+							</div>
+						</div>
+						<div class="form-group">
+							<label id='comment-label' for="inputComment" class="col-sm-2 control-label">Comment</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: comment"></span>
+								<textarea data-bind="value: comment" id="inputComment" class="form-control" rows="6" placeholder="Comment Text">
+								</textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<button data-bind="click: add, enable: isValid()" type="button" class="btn btn-primary">Submit</button> <button type="button" data-bind="click: showNewCommentPanel" class="btn btn-default">Cancel</button>
+							</div>
+						</div>
+					</form>
+				</div><!-- newcomment -->
+			</div><!-- New comment panel end -->
+
+			
+			<div id="propdetails">
+				<div data-bind="html: blurb">Hmm... This proposal has no content.</div>
+			</div>
+			<div id="showcomments">
+				<div class="col-md-6">
+					<h4>Points For</h4>
+					<div class="comments">
+					<!-- ko foreach: comments -->
+					<!-- ko if: comment_type() == 'for' -->
+					<div class="comment for">
+						<span data-bind="html: comment"></span>
+						<div data-bind="css: { supports: $parent.userSupports($data) }" class="select_comment">
+						<button data-bind="click: $parent.toggleCommentSupport" type="button" class="btn btn-default btn-xs">agree</button>
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+					</div>
+				</div>
+				<div class="col-md-6">
+					<h4>Points Against</h4>
+					<div class="comments">
+					<!-- ko foreach: comments -->
+					<!-- ko if: comment_type() == 'against' -->
+					<div class="comment against">
+						<span data-bind="html: comment"></span>
+						<div data-bind="css: { supports: $parent.userSupports($data) }" class="select_comment">
+						<button data-bind="click: $parent.toggleCommentSupport" type="button" class="btn btn-default btn-xs">agree</button>
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+					</div>
+				</div>
+			</div> 
+			<div id="showquestions">
+				<div class="row qaheaders">
+					<div class="col-md-6">
+						<h4>Questions</h4>
+					</div>
+					<div class="col-md-6">
+						<h4>Answers</h4>
+					</div>
+				</div>
+				<div class="comments">
+					<!-- ko foreach: comments -->
+					<!-- ko if: comment_type() == 'question' -->
+					<div class="qabox row">
+						<div class="col-md-6">
+							<div class="comment question">
+								<span data-bind="html: comment"></span>
+								<div data-bind="css: { supports: $parent.userSupports($data) }" class="select_comment">
+								<button data-bind="click: $parent.toggleCommentSupport" type="button" class="btn btn-default btn-xs">agree</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<!-- ko if: $parent.getAnswerObject(id) -->
+							<div data-bind="with: $parent.getAnswerObject(id)" class="comment answer">
+								<span data-bind="html: $data.comment"></span>
+								<div data-bind="css: { supports: $root.userSupports($data) }" class="select_comment">
+								<button data-bind="click: $root.toggleCommentSupport" type="button" class="btn btn-default btn-xs">like</button>
+								</div>
+							</div>
+							<!-- /ko -->
+							
+							<!-- ko ifnot: $parent.getAnswerObject(id) -->
+							<div class="comment no-answer">
+								<span>No answer yet</span>
+								<!-- ko if: $root.proposal.author_id() == currentUserViewModel.user.id -->
+								<div class="select_comment">
+								<button type="button" data-bind="click: $root.beginAnswer.bind($data)" class="btn btn-default btn-xs">answer</button>
+								</div>
+								<!-- /ko -->
+							</div>
+							<!-- /ko -->
+						</div>
+					</div>
+					<!-- /ko -->
+					<!-- /ko -->
+				</div>
+			</div>
+			</div>
+		  </div><!-- modal-body -->
+		<div class="modal-footer">
+		</div><!-- modal-footer -->
+	    </div><!-- modal-content -->
+	  </div><!-- modal-dialog -->
+	</div><!-- modal -->
+	
+	
+	
+	<!-- New Proposal Modal -->
+	<div id="addproposal" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="AddProposalBox" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title">Add Proposal</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="alert alert-danger"></div>
+			<form autocomplete="off" class="form-horizontal" role="form">
+		  	<div class="form-group">
+		    <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+		    <div class="col-sm-10">
+			  <span class="errormsg" data-bind="validationMessage: title"></span>
+		      <input data-bind="value: title" type="text" class="form-control input-lg" id="inputProposalTitle" placeholder="Title">
+		    </div>
+		  </div>
+		<div class="form-group">
+		    <label for="inputAbstract" class="col-sm-2 control-label">Abstract (optional)</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: abstract"></span>
+			<textarea data-bind="value: abstract" id="inputProposalAbstract" class="form-control" rows="4" placeholder="Abstract Text"></textarea>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputBlurb" class="col-sm-2 control-label">Proposal Text</label>
+		    <div class="col-sm-10">
+			<span class="errormsg" data-bind="validationMessage: blurb"></span>
+			<textarea data-bind="value: blurb" id="inputProposalBlurb" class="form-control" rows="6" placeholder="Proposal Text"></textarea>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <div class="col-sm-offset-2 col-sm-10">
+		      <button data-bind="click: addProposal, enable: isValid()" type="button" class="btn btn-primary">Submit</button>
+			  <button data-bind="click: close" type="button" class="btn btn-default">Cancel</button>
+		    </div>
+		  </div>
+		</form>
+		</div><!-- /.modal-body -->
+	    </div><!-- modal-content -->
+	  </div><!-- modal-dialog -->
+	</div><!-- modal -->
+	
+	<!-- Login Modal -->
+	<div id="login" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="LoginBox" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title" id="myModalLabel">
+						Log in
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="message alert alert-danger"></div>
+					<form autocomplete="off" class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="inputUsername" class="col-sm-2 control-label">Username</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: username"></span>
+								<input data-bind="value: username" type="text" class="form-control input-lg" id="inputUsername" placeholder="Username">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword" class="col-sm-2 control-label">Password</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: password"></span>
+								<input data-bind="value: password" type="password" class="form-control input-lg" id="inputPassword" placeholder="Password">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<div class="checkbox">
+									<label><input data-bind="checked: remember" type="checkbox"> Remember me</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<button data-bind="click: dologin, enable: isValid()" type="button" class="btn btn-primary">Sign in</button> <button data-bind="click: close" type="button" class="btn btn-default">Cancel</button>
+							</div>
+						</div>
+					</form>
+				</div><!-- modal-body -->
+			</div><!-- modal-content -->
+		</div><!-- modal-dialog -->
+	</div><!-- login modal -->
+	
+	<!-- Register Modal -->
+	<div id="register" class="modal fade" tabindex="=1" role="dialog" aria-labelledby="RegisterBox" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title" id="myModalLabel">
+						Register
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="message alert alert-danger"></div>
+					<p>Enter your details below. A confirmation email will be sent to the address you give after which you will be able to log in.</p>
+					<form autocomplete="off" class="form-horizontal" role="form">
+						<div class="form-group">
+							<label for="inputUsername" class="col-sm-2 control-label">Username</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: username"></span>
+								<input data-bind="value: username" type="text" class="form-control input-lg" id="inputUsername" placeholder="Username">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword" class="col-sm-2 control-label">Password</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: password"></span>
+								<input data-bind="value: password" type="password" class="form-control input-lg" id="inputPassword" placeholder="Password">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="inputEmail" class="col-sm-2 control-label">Email</label>
+							<div class="col-sm-10">
+								<span class="errormsg" data-bind="validationMessage: email"></span>
+								<input data-bind="value: email" type="text" class="form-control input-lg" id="inputEmail" placeholder="Email" type="email" required>
+								<span class="help-block">A valid email address is required to activate your account and reset your password if you lose it.</span>
+
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<button data-bind="click: register, enable: isValid()" type="button" class="btn btn-primary">Register</button> 
+								<button data-bind="click: close" type="button" class="btn btn-default">Cancel</button>
+							</div>
+						</div>
+					</form>
+				</div><!-- modal-body -->
+			</div><!-- modal-content -->
+		</div><!-- modal-dialog -->
+	</div><!-- register modal -->
+	
+	<script id="customMessageTemplate" type="text/html">
+    <em class="customMessage" data-bind='validationMessage: field'></em>
+	</script>
+
+
+	<script type="text/javascript">
+	
+	// var generation = getQuerySegment('gen');
+	
+	function initPage()
+	{
+		console.log('initPage called...');
+		$('.question-view, .voting-graphs, .current-proposals').show();
+		$.when(currentUserViewModel.loadUser(), 
+			   questionViewModel.fetchQuestion(), 
+			   questionViewModel.fetchVotingMap()).done(function( user_resp, quest_resp )
+		{
+			console.log('User and question loaded...');
+			
+			// Load Templates
+			$.get( STATIC_FILES + "/templates/analytics.template.html", function( template ) 
+			{
+				$('head').append( template );
+			});
+			$.get( STATIC_FILES + "/templates/navbar.template.html", function( template ) 
+			{
+				$( "#navbar" ).html( template );
+				ko.applyBindings(currentUserViewModel, $('#navbar')[0]);
+				$('.home').attr('href', VILFREDO_URL);
+			});
+			$.get( STATIC_FILES + "/templates/footer.template.html", function( template ) 
+			{
+				$( "#footer" ).html( template );
+				ko.applyBindings(currentUserViewModel, $('#footer')[0]);
+			});
+			$.get( STATIC_FILES + "/templates/login.template.html", function( template ) 
+			{
+				$('body').append( template )
+				ko.applyBindings(loginViewModel, $('#login')[0]);
+				$('#login').on('hide.bs.modal', function(e) {
+					loginViewModel().clear();
+				});
+				$('.pwdresetlink').attr('href', VILFREDO_URL+'/lostpassword');
+			});
+			
+			$.get( STATIC_FILES + "/templates/register.template.html", function( template ) 
+			{
+				$('body').append( template )
+				ko.applyBindings(registerViewModel, $('#register')[0]);
+				$('#register').on('hide.bs.modal', function(e) {
+					registerViewModel().clear();
+				});
+			});
+			
+			questionViewModel.selected_algorithm(2);
+			fetchGenerationGraph(questionViewModel.selected_generation(), questionViewModel.selected_algorithm());
+			
+			// Generate Tables
+			console.log("generation_id = " + generation_id);
+			questionViewModel.fetchDominationMap(questionViewModel.selected_algorithm());
+			questionViewModel.fetchLevelsMap(questionViewModel.selected_algorithm());
+			
+			if (questionViewModel.phase() == 'writing')
+		    {
+				proposalsViewModel.fetchInheritedProposals();
+				proposalsViewModel.fetchProposals({user_only: true});
+		    }
+		    else
+		    {
+		        proposalsViewModel.fetchProposals();
+		    }
+		
+		});
+	}
+	
+	$(function() 
+	{
+		currentUserViewModel = new CurrentUserViewModel();
+		proposalsViewModel = new ProposalsViewModel();
+		addProposalViewModel = ko.validatedObservable( new AddProposalViewModel() );
+		loginViewModel = ko.validatedObservable( new LoginViewModel() );
+		registerViewModel = ko.validatedObservable( new RegisterViewModel() );
+		voteMapViewModel = new VoteMapViewModel();
+		
+		//newCommentViewModel = new NewCommentViewModel();
+		newCommentViewModel = ko.validatedObservable( new NewCommentViewModel() );
+		
+		threeWayVoteViewModel = new ThreeWayVoteViewModel();
+		viewProposalViewModel = new ViewProposalViewModel();
+		questionViewModel = new QuestionViewModel();
+		
+		initPage();
+		
+		$('#viewproposal').on('shown.bs.modal', function() {
+			//console.log('votemapwindow modal shown...');
+			if (questionViewModel.phase() == 'voting')
+			{
+				$('.votebox').svg({loadURL: STATIC_FILES + '/images/triangle.svg', //});
+										   onLoad: init3WayTriangle});
+			}
+		})
+		
+		$('#votemapwindow').on('shown.bs.modal', function() {
+			//console.log('votemapwindow modal shown...');
+			$('#modalvotesmap').svg({onLoad: createVoteMap});
+		})
+		
+		$('#votemapwindow').on('hide.bs.modal', function() {
+			console.log('votemapwindow modal about to close, destroy map...');
+			$('#modalvotesmap').svg('destroy');
+			$('#votemap-thisprop').html('');
+		})
+		
+		ko.validation.init({ insertMessages: false, decorateElement: true, errorClass: "errormsg" });
+		
+		$(".question-info").each(function(){
+		    ko.applyBindings(questionViewModel, $(this)[0]);
+		});
+	
+		$(".proposals").each(function(){
+		    ko.applyBindings(proposalsViewModel, $(this)[0]);
+		});
+		ko.applyBindings(proposalsViewModel, $('.inherited_proposals')[0]);
+		
+		ko.applyBindings(proposalsViewModel, $('#keyplayer_info')[0]);
+				
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal #propdetails')[0]);
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal #showcomments')[0]);
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal #showquestions')[0]);
+		ko.applyBindings(viewProposalViewModel, $('#viewproposal .vpheader')[0]);
+		ko.applyBindings(newCommentViewModel, $('.newcommentpanel')[0]);
+		
+		ko.applyBindings(addProposalViewModel, $('#addproposal')[0]);
+		ko.applyBindings(threeWayVoteViewModel, $('#vote3waywindow')[0]);
+		
+		ko.applyBindings(voteMapViewModel, $('#votemapwindow')[0]);
+		
+		ko.applyBindings(questionViewModel, $('#domination_table')[0]);
+		ko.applyBindings(questionViewModel, $('#domination_levels_table')[0]);
+		
+		ko.applyBindings(questionViewModel, $('#generation_selector')[0]);
+		ko.applyBindings(questionViewModel, $('#algorithm_selector')[0]);
+		
+
+		$('#vote3waywindow').on('hidden.bs.modal', function () {
+  			console.log('vote3waywindow hidden...');
+			$(this).find('.show3waytriangle').svg('destroy');
+		});
+		
+		$('#viewproposal').on('hidden.bs.modal', function () {
+  			console.log('viewproposal hidden...');
+			viewProposalViewModel.reset();
+		});	
+		$('#viewproposal').on('shown.bs.modal', function () {
+			viewProposalViewModel.displayProposalContent();
+		});
+		
+		$('.home').attr('href', VILFREDO_URL);
+		$('.navbar-brand').attr('href', VILFREDO_URL);
+		
+		
+		
+		$('body').popover({
+		    selector: '[rel="popover"]',
+			trigger: 'hover',
+			html: true,
+			placement: 'top',
+			content: 'hello world',
+			title: 'Add your vote',
+			content: '<div class="poptriangle"></div>'
+		});
+		
+		$('body').tooltip({
+		    selector: '[rel=tooltip]',
+			html: true,
+			container: 'body'
+		});
+		
+		$('body').on('show.bs.popover', function () {
+  			console.log('popover displayed...');
+		});
+		$('body').on('hidden.bs.popover', function () {
+  			console.log('popover hidden...');
+		});	
+		
+		$("#inputProposalTitle").charCount({
+			allowed: 50,		
+			warning: 40,
+			counterText: "Characters Left" + " "
+		});
+		
+		$("#inputProposalBlurb").charCount({
+			allowed: 1000,		
+			warning: 100,
+			counterText: "Characters left" + " "
+		});
+		
+		$("#inputProposalAbstract").charCount({
+			allowed: 1000,		
+			warning: 100,
+			counterText: "Characters left" + " "
+		});
+	});	
+	</script>	
+	</body>
+</html>
